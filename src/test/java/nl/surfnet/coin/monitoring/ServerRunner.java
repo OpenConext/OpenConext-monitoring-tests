@@ -20,6 +20,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The name of this class does not end with Test, to make it not run as a regular unit test. Is is meant only as an integration test helper
+ */
 public class ServerRunner {
   private static final Logger LOG = LoggerFactory.getLogger(ServerRunner.class);
 

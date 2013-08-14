@@ -18,6 +18,7 @@ package nl.surfnet.coin.monitoring;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
@@ -30,22 +31,49 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 
+/**
+ * Main application class.
+ */
 public class Monitor {
 
   private static final Logger LOG = LoggerFactory.getLogger(Monitor.class);
+  private static final String DEFAULT_CONEXT_DOMAIN = "surfconext.nl";
 
+  private String mujinaVersion;
+  private Server server;
+
+  /**
+   *
+   * Main method.
+   * @param args command line arguments:
+   *             <ol>
+   *             <li><em>conextDomain</em> The domain to monitor. Examples: <em>surfconext.nl</em>, <em>demo.openconext.org</em></li>
+   *             </ol>
+   */
   public static void main(String[] args) throws Exception {
 
     Monitor monitor = new Monitor();
+    monitor.mujinaVersion = "";
     URI mujinaBaseUri = monitor.setupServer();
 
-    String conextDomain = args[0];
-    new Tester(conextDomain, mujinaBaseUri).runTests();
+    String conextDomain = DEFAULT_CONEXT_DOMAIN;
+    if (args.length >= 1) {
+      conextDomain = args[0];
+    } else {
+      LOG.info("No domain given, will use default: {}", conextDomain);
+    }
+    new Tester(conextDomain, mujinaBaseUri, IOUtils.toString(Monitor.class.getResourceAsStream("/engineblock.crt"))).runTests();
+    monitor.stopServer();
+
+  }
+
+  private void stopServer() throws Exception {
+    server.stop();
   }
 
 
   public URI setupServer() throws Exception {
-    Server server = new Server(8080);
+    server = new Server(8080);
 
     WebAppContext idpWebapp = new WebAppContext();
     idpWebapp.setContextPath("/idp");
@@ -61,7 +89,7 @@ public class Monitor {
 
     server.start();
 
-    return server.getURI();
+    return URI.create("http://localhost:8080");
   }
 
   public String getLocallyCachedWarFile(URL url) {

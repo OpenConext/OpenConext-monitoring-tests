@@ -16,51 +16,106 @@
 
 package nl.surfnet.coin.monitoring;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.joda.time.DateTime;
+import org.junit.Assert;
+import org.opensaml.saml2.metadata.EntityDescriptor;
+import org.opensaml.saml2.metadata.provider.*;
+import org.opensaml.xml.parse.BasicParserPool;
+import org.opensaml.xml.security.credential.CredentialResolver;
+import org.opensaml.xml.security.credential.StaticCredentialResolver;
+import org.opensaml.xml.security.keyinfo.StaticKeyInfoCredentialResolver;
+import org.opensaml.xml.security.x509.BasicX509Credential;
+import org.opensaml.xml.signature.SignatureTrustEngine;
+import org.opensaml.xml.signature.impl.ExplicitKeySignatureTrustEngine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Timer;
+
+import static org.junit.Assert.assertTrue;
 
 public class Engineblock {
+
+  private static final Logger LOG = LoggerFactory.getLogger(Engineblock.class);
+
   private final String engineUrlBase;
 
-  public Engineblock(String url) {
+  private AbstractReloadingMetadataProvider metadataProvider;
+
+  public Engineblock(String url, String engineblockCert) throws Exception {
     this.engineUrlBase = url;
+
+    org.opensaml.DefaultBootstrap.bootstrap();
+
+    Timer backgroundTaskTimer = new Timer(true); // Run as daemon, to not block JVM from quitting
+    // Provider of the Engine metadata.
+    metadataProvider = new HTTPMetadataProvider(backgroundTaskTimer, new org.apache.commons.httpclient.HttpClient(), engineUrlBase + "/authentication/idp/metadata");
+//    metadataProvider = new FilesystemMetadataProvider(new File(getClass().getResource("/metadata.xml").toURI()));
+
+    metadataProvider.setRequireValidMetadata(true);
+    metadataProvider.setParserPool(new BasicParserPool());
+
+    // Actually validate metadata after retrieval
+    MetadataFilterChain filterChain = new MetadataFilterChain();
+
+    /*
+      Filters in use are:
+       - schemavalidation. Based on the default schemata (SAML, XML), and extended with the MDUI-metadata schema
+       - Signature validation, backed by the locally stored certificate of Engineblock
+     */
+    filterChain.setFilters(Arrays.<MetadataFilter>asList(
+            new SchemaValidationFilter(new String[] {"/schema__/sstc-saml-metadata-ui-v1.0.xsd"}),
+            new SignatureValidationFilter(buildTrustEngine(engineblockCert))
+    ));
+    metadataProvider.setMetadataFilter(filterChain);
+  }
+
+  public void validateMetadata() throws Exception {
+
+    // Retrieve from source, immediately thereafter validating it using the configured MetadataFilter(s)
+    metadataProvider.initialize();
+
+    // Additional validations below
+
+    // Entity ID from metadata is expected to follow a certain naming scheme. ('https://engine' + domain + '/authentication/idp/metadata')
+    String correctEntityId = engineUrlBase + "/authentication/idp/metadata";
+    String entityIdFromMetadata = ((EntityDescriptor) metadataProvider.getMetadata()).getEntityID();
+    LOG.debug("Engine metadata has entity ID: {}", entityIdFromMetadata);
+    Assert.assertEquals(correctEntityId, entityIdFromMetadata);
+
+
+    EntityDescriptor entityDescriptor = metadataProvider.getEntityDescriptor(entityIdFromMetadata);
+
+    // validUntil interval should be greater than 12 hrs from now
+    DateTime halfDayFromNow = new DateTime().plusHours(12);
+    assertTrue("validUntil of the metadata should be at least 12 hrs in future", entityDescriptor.getValidUntil().isAfter(halfDayFromNow));
+
+    metadataProvider.destroy();
   }
 
 
-  public InputStream getMetadata() {
+  /**
+   * Get a TrustEngine by the given X509 certificate.
+   *
+   * @param x509cert the certificate to use in the TrustEngine
+   */
+  private SignatureTrustEngine buildTrustEngine(String x509cert) throws CertificateException {
 
-    try {
-      HttpClient defaultHttpClient = new DefaultHttpClient();
-
-      defaultHttpClient.getConnectionManager().getSchemeRegistry().register(new Scheme("https", 443, acceptAnySSLSocketFactory()));
-      return defaultHttpClient.execute(new HttpGet(engineUrlBase + "/authentication/idp/metadata")).getEntity().getContent();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    // Local certificate, used for validation of the metadata.
+    BasicX509Credential ebCredential = new BasicX509Credential();
+    CertificateFactory cf = CertificateFactory.getInstance("X.509");
+    X509Certificate cert = (X509Certificate)cf.generateCertificate(new ByteArrayInputStream(x509cert.getBytes()));
+    ebCredential.setEntityCertificate(cert);
+    CredentialResolver ebCredentialResolver = new StaticCredentialResolver(ebCredential);
+    return new ExplicitKeySignatureTrustEngine(ebCredentialResolver, new StaticKeyInfoCredentialResolver(ebCredential));
   }
 
-  public SSLSocketFactory acceptAnySSLSocketFactory() {
-
-    try {
-      return new SSLSocketFactory(new TrustStrategy() {
-
-        public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-          // Oh, I am easy...
-          return true;
-        }
-
-      });
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+  public void destroy() {
+    metadataProvider.destroy();
   }
 }

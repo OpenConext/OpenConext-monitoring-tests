@@ -1,56 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  ~ Copyright 2013 SURFnet bv, The Netherlands
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~ http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
-<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui" validUntil="2013-08-13T11:55:20Z" entityID="https://engine.demo.openconext.org/authentication/idp/metadata" ID="CORTOeed054e13e008630edbc74c4a00bf17fd1f5cfef"><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:SignedInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><ds:Reference URI="#CORTOeed054e13e008630edbc74c4a00bf17fd1f5cfef"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>RQLyVn0Vh39siYC4LiauDYXHoEY=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>Ib4CJQn5QXDUK8FHsM4zJTLiU97YDbuaMl5hdsy1TRJFXATSZ/hERUdPD1+DD9O2CrYGXko5rm7WgDGM+Do9kU0TIgTNoi0R7H3DaYfPecVI8A8l7fILqgPW0yA2M1dgH0TJQK/p+Vqsredkhc6vMD2PvIWli60dit1vXOSB+MJrYJqu/CJn+BeL7NYvHsfuo1hKM3FWeOWTyFnnxIlsJsIlRuCYHwfZcrN0bsHzkGjBauPhoxeAJuPlUfkLt96WwApt8bh8HhOtxFNQ0BIuRXqjxLuLg6Ry9Xy9CjWuzgcSH66LiNg2Vd1F3E3Hjbd1ni/UvSIq1+3w2T26DJTN4g==</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIDYzCCAkugAwIBAgIJAPWKgmHsCo8bMA0GCSqGSIb3DQEBBQUAMEgxFDASBgNV
-  BAMMC0VuZ2luZUJsb2NrMREwDwYDVQQLDAhTZXJ2aWNlczEQMA4GA1UECgwHU1VS
-  Rm5ldDELMAkGA1UEBhMCTkwwHhcNMTMwODA2MDgzNjQxWhcNMjMwODA2MDgzNjQx
-  WjBIMRQwEgYDVQQDDAtFbmdpbmVCbG9jazERMA8GA1UECwwIU2VydmljZXMxEDAO
-  BgNVBAoMB1NVUkZuZXQxCzAJBgNVBAYTAk5MMIIBIjANBgkqhkiG9w0BAQEFAAOC
-  AQ8AMIIBCgKCAQEAxsi0bRYz8x3cdvnPAZwi2OXrGzBQVVOX/7zPne1mCnQodsxi
-  8pdyj8S9VJkp+DIQyjKQwuReb3jWxp2ZQF3ePX3BYBFAgAseYkbfnV9SskJDJKqD
-  jRCWvHl+n6tqlsxYb0Z0nlysoydQ8XlRn1dnu8fbSBvhM1pyfzxcVmH3uOzkuV6P
-  fyKkeyy+Hf7XCbqaytQXQLIClzGA2m3fEHxIec3zyLs518CzHqtX0ZjrlHDW1s6b
-  68KCeh/+9Gddb97vtgs1M0wXJbKpwUeP5zcO159IpyT3cZkiUpLGhRO1mk1kaoS0
-  hG4zLXozIKt2apQImestgh4vsk5lY9UOB8awCwIDAQABo1AwTjAdBgNVHQ4EFgQU
-  ijmh5ckhDeVgDOUg55quQ6JFpoQwHwYDVR0jBBgwFoAUijmh5ckhDeVgDOUg55qu
-  Q6JFpoQwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOCAQEAMNlTkgP571FZ
-  bzUiq4LhQ3z/r9Yg3kmtI8Tr0iSg9qqziqUq4DwE25HebhJBevAgKtG7pEshzNiR
-  6F1U6SXLXClXZvXRDL2DDJ8G8dDMhBjVvhij6s8nvZd1DbuxcdUlEORGFocNHI8S
-  8JBmIeZiLQ7GmsngtIwkpKbDRfgnneZfPkD5Can+xVx9R0rn+w54mZhjfNWEUIBy
-  2Q/u7ypCQEVAYBaCViZnP1NVRn2kcu6Wx+Y9F5XRiDsH7VTucqNYKT5uqepOj9X3
-  Fh2gbK6Tq7d/+1Tza9+uQxUtoS8OuGLJ7fPiANRozCpE0yyvirA8kvhhqiUjkvhs
-  a2PGxf6xWQ==
-</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature><md:IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"><md:Extensions><mdui:UIInfo><mdui:Description xml:lang="nl">OpenConext SSO Proxy</mdui:Description><mdui:Description xml:lang="en">OpenConext SSO Proxy</mdui:Description><mdui:Logo height="96" width="96">https://static.demo.openconext.org/media/conext_logo.png</mdui:Logo><mdui:Keywords xml:lang="nl">openconext engine engineblock proxy sso saml2</mdui:Keywords><mdui:Keywords xml:lang="en">openconext engine engineblock proxy sso saml2</mdui:Keywords></mdui:UIInfo></md:Extensions><md:KeyDescriptor xmlns:ds="http://www.w3.org/2000/09/xmldsig#" use="signing"><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIDYzCCAkugAwIBAgIJAPWKgmHsCo8bMA0GCSqGSIb3DQEBBQUAMEgxFDASBgNV
-  BAMMC0VuZ2luZUJsb2NrMREwDwYDVQQLDAhTZXJ2aWNlczEQMA4GA1UECgwHU1VS
-  Rm5ldDELMAkGA1UEBhMCTkwwHhcNMTMwODA2MDgzNjQxWhcNMjMwODA2MDgzNjQx
-  WjBIMRQwEgYDVQQDDAtFbmdpbmVCbG9jazERMA8GA1UECwwIU2VydmljZXMxEDAO
-  BgNVBAoMB1NVUkZuZXQxCzAJBgNVBAYTAk5MMIIBIjANBgkqhkiG9w0BAQEFAAOC
-  AQ8AMIIBCgKCAQEAxsi0bRYz8x3cdvnPAZwi2OXrGzBQVVOX/7zPne1mCnQodsxi
-  8pdyj8S9VJkp+DIQyjKQwuReb3jWxp2ZQF3ePX3BYBFAgAseYkbfnV9SskJDJKqD
-  jRCWvHl+n6tqlsxYb0Z0nlysoydQ8XlRn1dnu8fbSBvhM1pyfzxcVmH3uOzkuV6P
-  fyKkeyy+Hf7XCbqaytQXQLIClzGA2m3fEHxIec3zyLs518CzHqtX0ZjrlHDW1s6b
-  68KCeh/+9Gddb97vtgs1M0wXJbKpwUeP5zcO159IpyT3cZkiUpLGhRO1mk1kaoS0
-  hG4zLXozIKt2apQImestgh4vsk5lY9UOB8awCwIDAQABo1AwTjAdBgNVHQ4EFgQU
-  ijmh5ckhDeVgDOUg55quQ6JFpoQwHwYDVR0jBBgwFoAUijmh5ckhDeVgDOUg55qu
-  Q6JFpoQwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOCAQEAMNlTkgP571FZ
-  bzUiq4LhQ3z/r9Yg3kmtI8Tr0iSg9qqziqUq4DwE25HebhJBevAgKtG7pEshzNiR
-  6F1U6SXLXClXZvXRDL2DDJ8G8dDMhBjVvhij6s8nvZd1DbuxcdUlEORGFocNHI8S
-  8JBmIeZiLQ7GmsngtIwkpKbDRfgnneZfPkD5Can+xVx9R0rn+w54mZhjfNWEUIBy
-  2Q/u7ypCQEVAYBaCViZnP1NVRn2kcu6Wx+Y9F5XRiDsH7VTucqNYKT5uqepOj9X3
-  Fh2gbK6Tq7d/+1Tza9+uQxUtoS8OuGLJ7fPiANRozCpE0yyvirA8kvhhqiUjkvhs
-  a2PGxf6xWQ==
-</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://engine.demo.openconext.org/authentication/idp/single-sign-on"/></md:IDPSSODescriptor><md:ContactPerson contactType="technical"><md:GivenName>Support</md:GivenName><md:SurName>OpenConext</md:SurName><md:EmailAddress>support@openconext.org</md:EmailAddress></md:ContactPerson><md:ContactPerson contactType="support"><md:GivenName>Support</md:GivenName><md:SurName>OpenConext</md:SurName><md:EmailAddress>support@openconext.org</md:EmailAddress></md:ContactPerson><md:ContactPerson contactType="administrative"><md:GivenName>Support</md:GivenName><md:SurName>OpenConext</md:SurName><md:EmailAddress>support@openconext.org</md:EmailAddress></md:ContactPerson></md:EntityDescriptor>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:mdui="urn:oasis:names:tc:SAML:metadata:ui" validUntil="2013-08-15T15:01:25Z" entityID="https://engine.surfconext.nl/authentication/idp/metadata" ID="CORTO06472605b4d23fa731261e365b0cd22605ba2a22"><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:SignedInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#"><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/><ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/><ds:Reference URI="#CORTO06472605b4d23fa731261e365b0cd22605ba2a22"><ds:Transforms><ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/><ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></ds:Transforms><ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/><ds:DigestValue>ylqUn9Gq0Qvoxvuvv3FhTGO+URE=</ds:DigestValue></ds:Reference></ds:SignedInfo><ds:SignatureValue>gLMQwJhY/x2aBIGXThh/uc+F0+Hy/jikdp6H+bz0JA8/GgtarShSNmB54JFEoGPwqk21k2cSZWK4R5SMCjW6TyieuQxRNSf/QntwGBEK0aqqKr0Izz+0YeBkxT+72Ko62zc5wTj0RWeJVNJXU9K+8GoFvMTCc5QJbEYMpBrjag+0MOEskcVmTHib+kjOeEEBn+YHlA7IJehpgCOLFDJqDpAjfTqeZBCIEFARZLs4oJTUfxPBaIvXYMFUFwvJ08nFRWLQ/BS/9vmivT/awlwTxDrqCrsyWH/az+Dr5JjPzq0pdZpEZAAg9iZx2hMuDf0j+0d9yWSvTIx0ub3BF5LqIA==</ds:SignatureValue><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIDyzCCArOgAwIBAgIJAMzixtXMUH1NMA0GCSqGSIb3DQEBBQUAMHwxCzAJBgNV
+BAYTAk5MMRAwDgYDVQQIDAdVdHJlY2h0MRAwDgYDVQQHDAdVdHJlY2h0MRUwEwYD
+VQQKDAxTVVJGbmV0IEIuVi4xEzARBgNVBAsMClNVUkZjb25leHQxHTAbBgNVBAMM
+FGVuZ2luZS5zdXJmY29uZXh0Lm5sMB4XDTExMDEyNDEwMTg1N1oXDTIxMDEyMzEw
+MTg1N1owfDELMAkGA1UEBhMCTkwxEDAOBgNVBAgMB1V0cmVjaHQxEDAOBgNVBAcM
+B1V0cmVjaHQxFTATBgNVBAoMDFNVUkZuZXQgQi5WLjETMBEGA1UECwwKU1VSRmNv
+bmV4dDEdMBsGA1UEAwwUZW5naW5lLnN1cmZjb25leHQubmwwggEiMA0GCSqGSIb3
+DQEBAQUAA4IBDwAwggEKAoIBAQDMJ6v+f3owS3KR5IXSil+3XFwGvCVeYx3jDOFK
+AnwvXlDpTu+t730b8/spHtlopyJVAlb6qBIPN7R4TGTLqiu0zebYsYx/PtqCk5cb
+u9qs3h+p2BBoTXVwXA/ZYi0tqtxp04hcNrRj1TAgLyC0S+KASTF+zzccAcjTBid5
+EMioo+YllgSEobWJ4X33XVRqNrikAPDsNmDrdKUi257JSO2xhVIG5lbtmDaL5ORC
+D56oRmVdp7VQTEQ3Yass8J5Rn+Ub6WmRBYeG+KzFBvtyBput2o0/gvtJn9L+NWeD
+B0LyUPaUYG/X4GF14FcmFQfz7I5jBCNHtPcLJbPYbZKQNhz/AgMBAAGjUDBOMB0G
+A1UdDgQWBBS9QqP8gtMM6nm4oYzNbgqhEDP1aDAfBgNVHSMEGDAWgBS9QqP8gtMM
+6nm4oYzNbgqhEDP1aDAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBBQUAA4IBAQBH
+2qyYwLwesIOxUTj+NJ0VXRBDH8VecNLiUUs9Np4x8A0pxLvlNnv5TdJAruEg1LSV
+mAqqPUdAB2m7CKDeUVM9cwOB7vqelV2GNgOfevXi+DZRMffyyE8qyIcnTqvDOgcR
+8qGTPSVT+SIsOkV9bYrjltrbnal7cJermsA8SC5w/pjLaOHI1xIZHquZzymWoN3Z
+fz2CQg2r5o+AURYd74GrHhHqVa9VrdWtcimB+vTQQihoLt8YciehpJjOMpx2D66e
+FfpC8ix31RRdjAVIo1y33h1yU3gEHePDbOthZE+lpXi2WJqO85H85LqJOtgn2WPI
+3P2Tx32Cq1WXCYkxLaPI
+</ds:X509Certificate></ds:X509Data></ds:KeyInfo></ds:Signature><md:IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol"><md:Extensions><mdui:UIInfo><mdui:DisplayName xml:lang="nl">SURFconext</mdui:DisplayName><mdui:DisplayName xml:lang="en">SURFconext</mdui:DisplayName><mdui:Description xml:lang="nl">SURFconext</mdui:Description><mdui:Description xml:lang="en">SURFconext</mdui:Description><mdui:Logo height="44" width="108">https://static.surfconext.nl/media/idp/surfnet.png</mdui:Logo><mdui:Keywords xml:lang="nl">SURFconext</mdui:Keywords><mdui:Keywords xml:lang="en">SURFconext</mdui:Keywords></mdui:UIInfo></md:Extensions><md:KeyDescriptor xmlns:ds="http://www.w3.org/2000/09/xmldsig#" use="signing"><ds:KeyInfo><ds:X509Data><ds:X509Certificate>MIIDyzCCArOgAwIBAgIJAMzixtXMUH1NMA0GCSqGSIb3DQEBBQUAMHwxCzAJBgNV
+BAYTAk5MMRAwDgYDVQQIDAdVdHJlY2h0MRAwDgYDVQQHDAdVdHJlY2h0MRUwEwYD
+VQQKDAxTVVJGbmV0IEIuVi4xEzARBgNVBAsMClNVUkZjb25leHQxHTAbBgNVBAMM
+FGVuZ2luZS5zdXJmY29uZXh0Lm5sMB4XDTExMDEyNDEwMTg1N1oXDTIxMDEyMzEw
+MTg1N1owfDELMAkGA1UEBhMCTkwxEDAOBgNVBAgMB1V0cmVjaHQxEDAOBgNVBAcM
+B1V0cmVjaHQxFTATBgNVBAoMDFNVUkZuZXQgQi5WLjETMBEGA1UECwwKU1VSRmNv
+bmV4dDEdMBsGA1UEAwwUZW5naW5lLnN1cmZjb25leHQubmwwggEiMA0GCSqGSIb3
+DQEBAQUAA4IBDwAwggEKAoIBAQDMJ6v+f3owS3KR5IXSil+3XFwGvCVeYx3jDOFK
+AnwvXlDpTu+t730b8/spHtlopyJVAlb6qBIPN7R4TGTLqiu0zebYsYx/PtqCk5cb
+u9qs3h+p2BBoTXVwXA/ZYi0tqtxp04hcNrRj1TAgLyC0S+KASTF+zzccAcjTBid5
+EMioo+YllgSEobWJ4X33XVRqNrikAPDsNmDrdKUi257JSO2xhVIG5lbtmDaL5ORC
+D56oRmVdp7VQTEQ3Yass8J5Rn+Ub6WmRBYeG+KzFBvtyBput2o0/gvtJn9L+NWeD
+B0LyUPaUYG/X4GF14FcmFQfz7I5jBCNHtPcLJbPYbZKQNhz/AgMBAAGjUDBOMB0G
+A1UdDgQWBBS9QqP8gtMM6nm4oYzNbgqhEDP1aDAfBgNVHSMEGDAWgBS9QqP8gtMM
+6nm4oYzNbgqhEDP1aDAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBBQUAA4IBAQBH
+2qyYwLwesIOxUTj+NJ0VXRBDH8VecNLiUUs9Np4x8A0pxLvlNnv5TdJAruEg1LSV
+mAqqPUdAB2m7CKDeUVM9cwOB7vqelV2GNgOfevXi+DZRMffyyE8qyIcnTqvDOgcR
+8qGTPSVT+SIsOkV9bYrjltrbnal7cJermsA8SC5w/pjLaOHI1xIZHquZzymWoN3Z
+fz2CQg2r5o+AURYd74GrHhHqVa9VrdWtcimB+vTQQihoLt8YciehpJjOMpx2D66e
+FfpC8ix31RRdjAVIo1y33h1yU3gEHePDbOthZE+lpXi2WJqO85H85LqJOtgn2WPI
+3P2Tx32Cq1WXCYkxLaPI
+</ds:X509Certificate></ds:X509Data></ds:KeyInfo></md:KeyDescriptor><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat><md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:unspecified</md:NameIDFormat><md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://engine.surfconext.nl/authentication/idp/single-sign-on"/></md:IDPSSODescriptor><md:Organization><md:OrganizationName xml:lang="en">SURFnet BV</md:OrganizationName><md:OrganizationDisplayName xml:lang="en">SURFnet</md:OrganizationDisplayName><md:OrganizationURL xml:lang="en">http://www.surfnet.nl</md:OrganizationURL></md:Organization><md:ContactPerson contactType="administrative"><md:GivenName>SURFconext-beheer</md:GivenName><md:EmailAddress>SURFconext-beheer@surfnet.nl</md:EmailAddress></md:ContactPerson><md:ContactPerson contactType="technical"><md:GivenName>SURFconext-beheer</md:GivenName><md:EmailAddress>SURFconext-beheer@surfnet.nl</md:EmailAddress></md:ContactPerson><md:ContactPerson contactType="support"><md:GivenName>SURFconext support</md:GivenName><md:EmailAddress>help@surfconext.nl</md:EmailAddress></md:ContactPerson></md:EntityDescriptor>

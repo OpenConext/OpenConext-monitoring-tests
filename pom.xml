@@ -9,6 +9,7 @@
 
   <properties>
     <jetty.version>9.0.4.v20130625</jetty.version>
+    <mujina.version>3.1.0</mujina.version>
   </properties>
 
   <inceptionYear>2013</inceptionYear>
@@ -70,6 +71,11 @@
       <version>1.0.6</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.opensaml</groupId>
+      <artifactId>opensaml</artifactId>
+      <version>2.5.3</version>
+    </dependency>
   </dependencies>
 
 
