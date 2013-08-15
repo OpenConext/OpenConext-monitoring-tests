@@ -16,8 +16,13 @@
 
 package nl.surfnet.coin.monitoring;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.joda.time.DateTime;
 import org.junit.Assert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.opensaml.saml2.metadata.EntityDescriptor;
 import org.opensaml.saml2.metadata.provider.*;
 import org.opensaml.xml.parse.BasicParserPool;
@@ -118,4 +123,26 @@ public class Engineblock {
   public void destroy() {
     metadataProvider.destroy();
   }
+
+
+  public void acceptConsentIfPresent(WebDriver driver) {
+    try {
+      WebElement button = driver.findElement(By.id("accept_terms_button"));
+      button.click();
+  } catch (NoSuchElementException e) {
+      LOG.debug("No consent screen, will skip without error.");
+   }
+
+  }
+
+  /**
+   * Choose the IdP that we currently working with
+   */
+  public void chooseIdPByLabel(WebDriver driver, String label) {
+    final String xpathExpression = String.format("//span[normalize-space()='%s']", StringEscapeUtils.escapeXml(label));
+    final WebElement element = driver.findElement(By.xpath(xpathExpression));
+    element.click();
+
+  }
+
 }

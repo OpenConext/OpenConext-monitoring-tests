@@ -28,7 +28,8 @@ public class ServerRunner {
 
   @Test
   public void setupServer() throws Exception {
-    new Monitor().setupServer();
+    String conextDomain = "demo.openconext.org";
+    new Monitor().setupServer(conextDomain);
     LOG.debug("Server started, will suspend thread now (sleep for a long long time)");
     Thread.sleep(1000 * 3600 * 24);
   }
