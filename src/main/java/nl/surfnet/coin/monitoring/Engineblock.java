@@ -16,6 +16,9 @@
 
 package nl.surfnet.coin.monitoring;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.protocol.Protocol;
+import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.joda.time.DateTime;
 import org.junit.Assert;
@@ -26,7 +29,6 @@ import org.openqa.selenium.WebElement;
 import org.opensaml.saml2.metadata.EntityDescriptor;
 import org.opensaml.saml2.metadata.provider.*;
 import org.opensaml.xml.parse.BasicParserPool;
-import org.opensaml.xml.security.credential.CredentialResolver;
 import org.opensaml.xml.security.credential.StaticCredentialResolver;
 import org.opensaml.xml.security.keyinfo.StaticKeyInfoCredentialResolver;
 import org.opensaml.xml.security.x509.BasicX509Credential;
@@ -36,10 +38,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Timer;
 
 import static org.junit.Assert.assertTrue;
@@ -52,15 +57,20 @@ public class Engineblock {
 
   private AbstractReloadingMetadataProvider metadataProvider;
 
-  public Engineblock(String url, String engineblockCert) throws Exception {
+  public Engineblock(String url, String engineblockCert, String trustChain) throws Exception {
     this.engineUrlBase = url;
 
     org.opensaml.DefaultBootstrap.bootstrap();
 
     Timer backgroundTaskTimer = new Timer(true); // Run as daemon, to not block JVM from quitting
     // Provider of the Engine metadata.
-    metadataProvider = new HTTPMetadataProvider(backgroundTaskTimer, new org.apache.commons.httpclient.HttpClient(), engineUrlBase + "/authentication/idp/metadata");
-//    metadataProvider = new FilesystemMetadataProvider(new File(getClass().getResource("/metadata.xml").toURI()));
+
+    if (trustChain != null) {
+      configureHttpClientSslTrust(trustChain);
+    }
+
+    HttpClient client = new HttpClient();
+    metadataProvider = new HTTPMetadataProvider(backgroundTaskTimer, client, engineUrlBase + "/authentication/idp/metadata");
 
     metadataProvider.setRequireValidMetadata(true);
     metadataProvider.setParserPool(new BasicParserPool());
@@ -75,9 +85,14 @@ public class Engineblock {
      */
     filterChain.setFilters(Arrays.<MetadataFilter>asList(
             new SchemaValidationFilter(new String[] {"/schema__/sstc-saml-metadata-ui-v1.0.xsd"}),
-            new SignatureValidationFilter(buildTrustEngine(engineblockCert))
+            new SignatureValidationFilter(buildTrustEngine(engineblockCert, trustChain))
     ));
     metadataProvider.setMetadataFilter(filterChain);
+  }
+
+  private void configureHttpClientSslTrust(String cert) throws IOException, GeneralSecurityException {
+
+    Protocol.registerProtocol("https", new Protocol("https", (ProtocolSocketFactory) new TrustSSLProtocolSocketFactory(cert), 443));
   }
 
   public void validateMetadata() throws Exception {
@@ -105,19 +120,26 @@ public class Engineblock {
 
 
   /**
-   * Get a TrustEngine by the given X509 certificate.
+   * Get a TrustEngine by the given X509 certificate (chain).
    *
-   * @param x509cert the certificate to use in the TrustEngine
+   * @param x509certChain the certificate chain to use in the TrustEngine
    */
-  private SignatureTrustEngine buildTrustEngine(String x509cert) throws CertificateException {
+  private SignatureTrustEngine buildTrustEngine(String entityCertPEM, String x509certChain) throws CertificateException {
 
     // Local certificate, used for validation of the metadata.
     BasicX509Credential ebCredential = new BasicX509Credential();
     CertificateFactory cf = CertificateFactory.getInstance("X.509");
-    X509Certificate cert = (X509Certificate)cf.generateCertificate(new ByteArrayInputStream(x509cert.getBytes()));
-    ebCredential.setEntityCertificate(cert);
-    CredentialResolver ebCredentialResolver = new StaticCredentialResolver(ebCredential);
-    return new ExplicitKeySignatureTrustEngine(ebCredentialResolver, new StaticKeyInfoCredentialResolver(ebCredential));
+
+    X509Certificate entityCertificate = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(entityCertPEM.getBytes()));
+    ebCredential.setPublicKey(entityCertificate.getPublicKey());
+    ebCredential.setEntityCertificate(entityCertificate);
+
+    if (x509certChain != null) {
+      @SuppressWarnings("unchecked")
+      Collection<X509Certificate> certs = (Collection<X509Certificate>) cf.generateCertificates(new ByteArrayInputStream(x509certChain.getBytes()));
+      ebCredential.setEntityCertificateChain(certs);
+    }
+    return new ExplicitKeySignatureTrustEngine(new StaticCredentialResolver(ebCredential), new StaticKeyInfoCredentialResolver(ebCredential));
   }
 
   public void destroy() {
@@ -142,7 +164,6 @@ public class Engineblock {
     final String xpathExpression = String.format("//span[normalize-space()='%s']", StringEscapeUtils.escapeXml(label));
     final WebElement element = driver.findElement(By.xpath(xpathExpression));
     element.click();
-
   }
 
 }

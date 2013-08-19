@@ -21,18 +21,12 @@
   <formats>
     <format>zip</format>
   </formats>
-  <files>
-    <file>
-      <source>src/main/deploy/logback.xml</source>
-    </file>
-    <file>
-      <source>src/main/deploy/engineblock-prod.crt</source>
-    </file>
-    <file>
-      <source>src/main/deploy/monitor.sh</source>
-      <filtered>true</filtered>
-    </file>
-  </files>
+  <fileSets>
+    <fileSet>
+      <directory>src/main/deploy</directory>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>
+  </fileSets>
 
   <includeBaseDirectory>false</includeBaseDirectory>
 

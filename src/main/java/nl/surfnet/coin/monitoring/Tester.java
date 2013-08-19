@@ -16,12 +16,15 @@
 
 package nl.surfnet.coin.monitoring;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 
 import static org.junit.Assert.assertTrue;
@@ -32,42 +35,49 @@ public class Tester {
 
   private final String conextDomain;
   private final String engineblockCert;
+  private final String trustChain;
   private WebDriver driver;
 
-  private Mujina mujina;
+  private MujinaClient mujinaClient;
 
   private void initWebDriver() {
     driver = new HtmlUnitDriver(true);
     driver.manage().deleteAllCookies();
   }
 
-  public Tester(String conextDomain, URI serverBaseUri, String engineblockCert) throws Exception {
+  public Tester(String conextDomain, URI serverBaseUri, String engineblockCert, String trustChain) throws Exception {
     initWebDriver();
-    mujina = new Mujina(driver, serverBaseUri);
+    mujinaClient = new MujinaClient(driver, serverBaseUri);
     this.conextDomain = conextDomain;
     this.engineblockCert = engineblockCert;
+    this.trustChain = trustChain;
   }
 
-  public void runTests() {
-    LOG.info("Running test for login flow using Mujina SP/IdP");
-    loginFlow();
+  public void runTests() throws IOException {
+    try {
+      LOG.info("Running test for login flow using Mujina SP/IdP");
+      loginFlow();
+    } catch (RuntimeException|Error e) {
+      File tmpFile = File.createTempFile("monitor", ".txt");
+      String output = String.format("Current URL: %s\nPage source:\n%s", driver.getCurrentUrl(), driver.getPageSource());
+      FileUtils.writeStringToFile(tmpFile, output);
+      LOG.info("Caught exception. WebDriver's current state has been dumped in file: {} Will rethrow exception.", tmpFile.getPath());
+      throw e;
+    } finally {
+      driver.quit();
+    }
+
 
     LOG.info("Running test for validating metadata of Engineblock");
     metadata();
 
-    driver.quit();
-  }
 
-  public void restartBrowser() {
-    driver.quit();
-    initWebDriver();
-    mujina.setDriver(driver);
   }
 
   public void metadata() {
     try {
 
-      Engineblock engineblock = new Engineblock("https://engine." + conextDomain, engineblockCert);
+      Engineblock engineblock = new Engineblock("https://engine." + conextDomain, engineblockCert, trustChain);
 
       engineblock.validateMetadata();
       engineblock.destroy();
@@ -78,27 +88,24 @@ public class Tester {
   }
 
   public void loginFlow() {
-    mujina.spHome();
+    mujinaClient.spHome();
 
     LOG.debug("url: {}", driver.getCurrentUrl());
 
     // Go to protected page
-    mujina.protectedPage();
+    mujinaClient.protectedPage();
 
     // Expect EB WAYF
     assertTrue("Expecting a WAYF. URL was: " + driver.getCurrentUrl(), driver.getPageSource().contains("Login via your institution"));
 
     chooseIdPByLabel(driver, "monitoring-idp");
-    mujina.login("i-am-a-user", "pass");
+    mujinaClient.login("monitor-user-" + System.currentTimeMillis(), "somepass");
     acceptConsent(driver);
     assertTrue("should be on SP", driver.getCurrentUrl().contains("/sp/user.jsp"));
     assertTrue("Should contain SAML attributes", driver.findElement(By.id("assertionAttributes")).getText().contains("j.doe@example.com"));
-    driver.quit();
+    assertTrue("Should contain my full name", driver.getPageSource().contains("John Doe"));
 
-    mujina.login("monitor-user", "somepass");
 
-    assertTrue(driver.getCurrentUrl().contains("/sp/"));
-    assertTrue(driver.getPageSource().contains("John Doe"));
 
   }
 

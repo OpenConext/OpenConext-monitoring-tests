@@ -23,11 +23,11 @@ import java.net.URI;
 
 import static org.junit.Assert.assertTrue;
 
-public class Mujina {
+public class MujinaClient {
   private WebDriver driver;
   private final URI serverBaseUri;
 
-  public Mujina(WebDriver driver, URI serverBaseUri) {
+  public MujinaClient(WebDriver driver, URI serverBaseUri) {
     this.driver = driver;
     this.serverBaseUri = serverBaseUri;
   }
