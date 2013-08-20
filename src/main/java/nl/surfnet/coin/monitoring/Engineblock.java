@@ -43,9 +43,7 @@ import java.security.GeneralSecurityException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Timer;
+import java.util.*;
 
 import static org.junit.Assert.assertTrue;
 
@@ -54,40 +52,24 @@ public class Engineblock {
   private static final Logger LOG = LoggerFactory.getLogger(Engineblock.class);
 
   private final String engineUrlBase;
-
-  private AbstractReloadingMetadataProvider metadataProvider;
+  private final String engineblockCert;
+  private final String trustChain;
+  private Set<BaseMetadataProvider> metadataProviders = new HashSet<BaseMetadataProvider>();
 
   public Engineblock(String url, String engineblockCert, String trustChain) throws Exception {
     this.engineUrlBase = url;
 
+    this.engineblockCert = engineblockCert;
+    this.trustChain = trustChain;
+
     org.opensaml.DefaultBootstrap.bootstrap();
 
-    Timer backgroundTaskTimer = new Timer(true); // Run as daemon, to not block JVM from quitting
     // Provider of the Engine metadata.
 
     if (trustChain != null) {
       configureHttpClientSslTrust(trustChain);
     }
 
-    HttpClient client = new HttpClient();
-    metadataProvider = new HTTPMetadataProvider(backgroundTaskTimer, client, engineUrlBase + "/authentication/idp/metadata");
-
-    metadataProvider.setRequireValidMetadata(true);
-    metadataProvider.setParserPool(new BasicParserPool());
-
-    // Actually validate metadata after retrieval
-    MetadataFilterChain filterChain = new MetadataFilterChain();
-
-    /*
-      Filters in use are:
-       - schemavalidation. Based on the default schemata (SAML, XML), and extended with the MDUI-metadata schema
-       - Signature validation, backed by the locally stored certificate of Engineblock
-     */
-    filterChain.setFilters(Arrays.<MetadataFilter>asList(
-            new SchemaValidationFilter(new String[] {"/schema__/sstc-saml-metadata-ui-v1.0.xsd"}),
-            new SignatureValidationFilter(buildTrustEngine(engineblockCert, trustChain))
-    ));
-    metadataProvider.setMetadataFilter(filterChain);
   }
 
   private void configureHttpClientSslTrust(String cert) throws IOException, GeneralSecurityException {
@@ -95,12 +77,9 @@ public class Engineblock {
     Protocol.registerProtocol("https", new Protocol("https", (ProtocolSocketFactory) new TrustSSLProtocolSocketFactory(cert), 443));
   }
 
-  public void validateMetadata() throws Exception {
+  public void validateIdpProxyMetadata() throws Exception {
 
-    // Retrieve from source, immediately thereafter validating it using the configured MetadataFilter(s)
-    metadataProvider.initialize();
-
-    // Additional validations below
+    MetadataProvider metadataProvider = createMetadataProvider(engineUrlBase + "/authentication/idp/metadata");
 
     // Entity ID from metadata is expected to follow a certain naming scheme. ('https://engine' + domain + '/authentication/idp/metadata')
     String correctEntityId = engineUrlBase + "/authentication/idp/metadata";
@@ -115,9 +94,20 @@ public class Engineblock {
     DateTime halfDayFromNow = new DateTime().plusHours(12);
     assertTrue("validUntil of the metadata should be at least 12 hrs in future", entityDescriptor.getValidUntil().isAfter(halfDayFromNow));
 
-    metadataProvider.destroy();
   }
 
+
+  public void validateIdpsMetadata() throws Exception {
+
+    // creating the provider will effectively validate against schema and signature.
+    createMetadataProvider(engineUrlBase + "/authentication/proxy/idps-metadata");
+
+  }
+
+
+  public void validateSpProxyMetadata() throws Exception {
+    createMetadataProvider(engineUrlBase + "/authentication/sp/metadata");
+  }
 
   /**
    * Get a TrustEngine by the given X509 certificate (chain).
@@ -143,7 +133,43 @@ public class Engineblock {
   }
 
   public void destroy() {
-    metadataProvider.destroy();
+    for (BaseMetadataProvider prov : metadataProviders) {
+      prov.destroy();
+    }
+  }
+
+  public MetadataProvider createMetadataProvider(String url) throws MetadataProviderException, CertificateException {
+
+    Timer backgroundTaskTimer = new Timer(true); // Run as daemon, to not block JVM from quitting
+
+
+    HttpClient client = new HttpClient();
+    AbstractReloadingMetadataProvider metadataProvider = new HTTPMetadataProvider(backgroundTaskTimer, client, url);
+
+    metadataProvider.setRequireValidMetadata(true);
+    metadataProvider.setParserPool(new BasicParserPool());
+
+    // Actually validate metadata after retrieval
+    MetadataFilterChain filterChain = new MetadataFilterChain();
+
+    /*
+      Filters in use are:
+       - schemavalidation. Based on the default schemata (SAML, XML), and extended with the MDUI-metadata schema
+       - Signature validation, backed by the locally stored certificate of Engineblock
+     */
+    filterChain.setFilters(Arrays.<MetadataFilter>asList(
+            new SchemaValidationFilter(new String[] {"/schema__/sstc-saml-metadata-ui-v1.0.xsd"}),
+            new SignatureValidationFilter(buildTrustEngine(engineblockCert, trustChain))
+    ));
+    metadataProvider.setMetadataFilter(filterChain);
+
+    // Retrieve from source, immediately thereafter validating it using the configured MetadataFilter(s)
+    metadataProvider.initialize();
+
+    // for later destroying
+    metadataProviders.add(metadataProvider);
+
+    return metadataProvider;
   }
 
 

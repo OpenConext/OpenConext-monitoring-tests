@@ -78,8 +78,15 @@ public class Tester {
     try {
 
       Engineblock engineblock = new Engineblock("https://engine." + conextDomain, engineblockCert, trustChain);
+      LOG.info("Validating IDP Proxy metadata...");
+      engineblock.validateIdpProxyMetadata();
 
-      engineblock.validateMetadata();
+      LOG.info("Validating SP Proxy metadata...");
+      engineblock.validateSpProxyMetadata();
+
+      LOG.info("Validating IDPs metadata...");
+      engineblock.validateIdpsMetadata();
+
       engineblock.destroy();
 
     } catch (Exception e) {

@@ -17,6 +17,7 @@
 package nl.surfnet.coin.monitoring;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -32,6 +33,7 @@ import static org.junit.Assert.assertTrue;
 public class TesterTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(TesterTest.class);
+  private Engineblock engineblock;
 
 
   @Test
@@ -52,9 +54,22 @@ public class TesterTest {
     driver.quit();
   }
 
-  @Test
-  public void validateMetadata() throws Exception {
+  @Before
+  public void setup() throws Exception {
     String crt = IOUtils.toString(getClass().getResourceAsStream("/engine.surfconext.nl.pem"));
-    new Engineblock("https://engine.surfconext.nl", crt, null).validateMetadata();
+    engineblock = new Engineblock("https://engine.surfconext.nl", crt, null);
+  }
+
+  @Test
+  public void validateIdpProxyMetadata() throws Exception {
+    engineblock.validateIdpProxyMetadata();
+  }
+  @Test
+  public void validateIdpsMetadata() throws Exception {
+    engineblock.validateIdpsMetadata();
+  }
+  @Test
+  public void validateSpProxyMetadata() throws Exception {
+    engineblock.validateSpProxyMetadata();
   }
 }

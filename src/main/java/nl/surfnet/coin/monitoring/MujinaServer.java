@@ -26,8 +26,10 @@ import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.opensaml.util.resource.ClasspathResource;
@@ -184,19 +186,19 @@ public class MujinaServer {
   public void configureSSL(Server server, int port) throws Exception {
 
     SslContextFactory sslContextFactory = new SslContextFactory();
-    SslConnectionFactory sslConnectionFactory = new SslConnectionFactory(sslContextFactory, "http/1.1");
 
-    sslConnectionFactory.getSslContextFactory().setKeyStore(createKeystore());
-    sslConnectionFactory.getSslContextFactory().setKeyStorePassword(KEYSTORE_PASSWORD);
+//    SslConnectionFactory sslConnectionFactory = new SslConnectionFactory(sslContextFactory, "http/1.1");
 
-    HttpConfiguration config = new HttpConfiguration();
-    config.setSecureScheme("https");
-    config.setSecurePort(port);
-    HttpConfiguration sslConfiguration = new HttpConfiguration(config);
-    sslConfiguration.addCustomizer(new SecureRequestCustomizer());
-    ServerConnector connector = new ServerConnector(server,
-            sslConnectionFactory,
-            new HttpConnectionFactory(sslConfiguration));
+    sslContextFactory.setKeyStore(createKeystore());
+    sslContextFactory.setKeyStorePassword(KEYSTORE_PASSWORD);
+    SslSelectChannelConnector connector = new SslSelectChannelConnector(sslContextFactory);
+
+//
+//    HttpConfiguration config = new HttpConfiguration();
+//    config.setSecureScheme("https");
+//    config.setSecurePort(port);
+//    HttpConfiguration sslConfiguration = new HttpConfiguration(config);
+//    sslConfiguration.addCustomizer(new SecureRequestCustomizer());
 
 
     connector.setPort(port);
