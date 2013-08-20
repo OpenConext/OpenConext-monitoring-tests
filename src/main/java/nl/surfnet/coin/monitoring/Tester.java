@@ -57,12 +57,12 @@ public class Tester {
     try {
       LOG.info("Running test for login flow using Mujina SP/IdP");
       loginFlow();
-    } catch (RuntimeException|Error e) {
+    } catch (Throwable e) {
       File tmpFile = File.createTempFile("monitor", ".txt");
       String output = String.format("Current URL: %s\nPage source:\n%s", driver.getCurrentUrl(), driver.getPageSource());
       FileUtils.writeStringToFile(tmpFile, output);
       LOG.info("Caught exception. WebDriver's current state has been dumped in file: {} Will rethrow exception.", tmpFile.getPath());
-      throw e;
+      throw new RuntimeException(e);
     } finally {
       driver.quit();
     }

@@ -69,14 +69,12 @@ public class Monitor {
       String trustChain = trustChainFile == null ? null : IOUtils.toString(new File(trustChainFile).toURI());
       new Tester(conextDomain, mujinaBaseUri, IOUtils.toString(new File(certificateFile).toURI()), trustChain).runTests();
       LOG.info("All tests succeeded");
+    } catch (Throwable t) {
+      LOG.info("While running", t);
     } finally {
       LOG.debug("Tearing down Jetty servlet container");
-      monitor.stopServer();
+      mujinaServer.stop();
     }
-  }
-
-  private void stopServer() throws Exception {
-    mujinaServer.stop();
   }
 
 
