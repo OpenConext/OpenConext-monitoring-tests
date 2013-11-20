@@ -51,10 +51,9 @@ public class Monitor {
       System.err.println("conextDomain: domain to monitor. Example: surfconext.nl");
       System.err.println("certificateFile: Engineblock's public key, X509, with pem headers");
       System.err.println("trustChainFile (optional): Trust chain resolving Engine Block's public key's trust, X509, with pem headers");
-      return;
+      System.exit(3);
     }
 
-    Monitor monitor = new Monitor();
     try {
       String conextDomain = args[0];
       String certificateFile = args[1];
@@ -69,8 +68,10 @@ public class Monitor {
       String trustChain = trustChainFile == null ? null : IOUtils.toString(new File(trustChainFile).toURI());
       new Tester(conextDomain, mujinaBaseUri, IOUtils.toString(new File(certificateFile).toURI()), trustChain).runTests();
       LOG.info("All tests succeeded");
+      System.exit(0);
     } catch (Throwable t) {
-      LOG.info("While running", t);
+      LOG.error("Exiting because of exception", t);
+      System.exit(2);
     } finally {
       LOG.debug("Tearing down Jetty servlet container");
       mujinaServer.stop();
