@@ -2,6 +2,7 @@
 #
 # Wrapper for monitoring application
 
+
 DIRECTORY=`dirname $0`
 
 LOGBACK_CONFIG=$DIRECTORY/logback.xml
@@ -11,4 +12,4 @@ java \
   -Dlogback.configurationFile=$LOGBACK_CONFIG \
   -Dmonitor.propertiesFile=$PROPERTIES_FILE \
     -classpath "$DIRECTORY/lib/*:$DIRECTORY/../keys" \
-  nl.surfnet.coin.monitoring.SAMLMonitor
+  nl.surfnet.coin.monitoring.MetadataMonitor

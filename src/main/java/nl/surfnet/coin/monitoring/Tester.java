@@ -33,27 +33,18 @@ public class Tester {
 
   private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(Tester.class);
 
-  private final String conextDomain;
-  private final String engineblockCert;
-  private final String trustChain;
   private WebDriver driver;
 
   private MujinaClient mujinaClient;
 
-  private void initWebDriver() {
+  public Tester(URI serverBaseUri) throws Exception {
     driver = new HtmlUnitDriver(true);
     driver.manage().deleteAllCookies();
-  }
-
-  public Tester(String conextDomain, URI serverBaseUri, String engineblockCert, String trustChain) throws Exception {
-    initWebDriver();
     mujinaClient = new MujinaClient(driver, serverBaseUri);
-    this.conextDomain = conextDomain;
-    this.engineblockCert = engineblockCert;
-    this.trustChain = trustChain;
   }
 
   public void runTests() throws IOException {
+
     try {
       LOG.info("Running test for login flow using Mujina SP/IdP");
       loginFlow();
@@ -65,32 +56,6 @@ public class Tester {
       throw new RuntimeException(e);
     } finally {
       driver.quit();
-    }
-
-
-    LOG.info("Running test for validating metadata of Engineblock");
-    metadata();
-
-
-  }
-
-  public void metadata() {
-    try {
-
-      Engineblock engineblock = new Engineblock("https://engine." + conextDomain, engineblockCert, trustChain);
-      LOG.info("Validating IDP Proxy metadata...");
-      engineblock.validateIdpProxyMetadata();
-
-      LOG.info("Validating SP Proxy metadata...");
-      engineblock.validateSpProxyMetadata();
-
-      LOG.info("Validating IDPs metadata...");
-      engineblock.validateIdpsMetadata();
-
-      engineblock.destroy();
-
-    } catch (Exception e) {
-      throw new RuntimeException(e);
     }
   }
 
@@ -105,20 +70,12 @@ public class Tester {
     // Expect EB WAYF
     assertTrue("Expecting a WAYF. URL was: " + driver.getCurrentUrl(), driver.getPageSource().contains("Login via your institution"));
 
-    chooseIdPByLabel(driver, "monitoring-idp");
+    chooseIdPByLabel(driver, "SURFconext monitoring IdP");
     mujinaClient.login("monitor-user-" + System.currentTimeMillis(), "somepass");
-    acceptConsent(driver);
-    assertTrue("should be on SP", driver.getCurrentUrl().contains("/sp/user.jsp"));
+
+    assertTrue("should be on SP, while current URL is: " + driver.getCurrentUrl(), driver.getCurrentUrl().contains("/sp/user.jsp"));
     assertTrue("Should contain SAML attributes", driver.findElement(By.id("assertionAttributes")).getText().contains("j.doe@example.com"));
     assertTrue("Should contain my full name", driver.getPageSource().contains("John Doe"));
-
-
-
-  }
-
-
-  private void acceptConsent(WebDriver driver) {
-    driver.findElement(By.id("accept_terms_button")).click();
   }
 
   /**

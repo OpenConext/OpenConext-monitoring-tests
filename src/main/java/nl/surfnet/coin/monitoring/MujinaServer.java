@@ -16,9 +16,11 @@
 
 package nl.surfnet.coin.monitoring;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
@@ -26,6 +28,8 @@ import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMReader;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.HandlerList;
@@ -38,17 +42,16 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.security.KeyFactory;
 import java.security.KeyStore;
-import java.security.PrivateKey;
+import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.interfaces.RSAPrivateKey;
 
 /**
  * Container for setting up Mujina SP and Mujina IdP
@@ -59,25 +62,25 @@ public class MujinaServer {
 
   private static final String MUJINA_VERSION = "3.1.0";
 
-  public static final String SERVER_SSL_CERT = "/mujina-server-cert.der";
-  public static final String SERVER_SSL_KEY = "/mujina-server-key.der";
-
   public static final String KEYSTORE_PASSWORD = "000123";
   private static final int SSL_PORT = 8443;
   private static final String SP_ENTITY_ID = "https://monitoring-sp";
   private static final String IDP_ENTITY_ID = "https://monitoring-idp";
+  public static final String MUJINA_REPO_BASE = "https://build.surfconext.nl/repository/public/releases";
 
   private Server server;
+  private X509Certificate certificate;
+  private RSAPrivateKey privateKey;
 
 
-  public MujinaServer() {
-
-  }
-
-
-  public URI setupServer(String conextDomain) throws Exception {
+  public URI setupServer(String conextDomain, String privateKeyPath, String certPath) throws Exception {
 
     String baseURI = "https://localhost:" + SSL_PORT;
+
+    Security.addProvider(new BouncyCastleProvider());
+
+    certificate = (X509Certificate) new PEMReader(new InputStreamReader(new ClasspathResource(certPath).getInputStream())).readObject();
+    privateKey = (RSAPrivateKey) new PEMReader(new InputStreamReader(new ClasspathResource(privateKeyPath).getInputStream())).readObject();
 
     server = new Server();
 
@@ -132,25 +135,34 @@ public class MujinaServer {
     put.setEntity(new StringEntity(String.format("{\"value\": \"%s\"}", IDP_ENTITY_ID), ContentType.APPLICATION_JSON));
     httpClient.execute(put);
 
+    // enable signing by Mujina IdP
+    put = new HttpPut(baseURI + "/idp/api/needs-signing");
+    put.setEntity(new StringEntity(String.format("{\"value\": \"%s\"}", "true"), ContentType.APPLICATION_JSON));
+    httpClient.execute(put);
+
+    // Set signing credentials on the IdP
+    HttpPost post = new HttpPost(baseURI + "/idp/api/signing-credential");
+    String certificate = new String(Base64.encodeBase64(this.certificate.getEncoded()));
+    String key = new String(Base64.encodeBase64(this.privateKey.getEncoded()));
+    String content = String.format("{\"certificate\": \"%s\", \"key\": \"%s\"}", certificate, key);
+    LOG.debug("Signing content: {}", content);
+    post.setEntity(new StringEntity(content, ContentType.APPLICATION_JSON));
+    HttpResponse response = httpClient.execute(post);
+//    response.getEntity().writeTo(System.out);
 
   }
 
   private KeyStore createKeystore() throws Exception {
     KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
     keystore.load(null, KEYSTORE_PASSWORD.toCharArray());
-    Certificate cert = CertificateFactory.getInstance("X.509").generateCertificate(new ClasspathResource(SERVER_SSL_CERT).getInputStream());
-
-    KeyFactory kf = KeyFactory.getInstance("RSA");
-    PKCS8EncodedKeySpec keysp = new PKCS8EncodedKeySpec(IOUtils.toByteArray(new ClasspathResource(SERVER_SSL_KEY).getInputStream()));
-    PrivateKey ff = kf.generatePrivate(keysp);
-    keystore.setKeyEntry("alias", ff, KEYSTORE_PASSWORD.toCharArray(), new Certificate[]{cert});
+    keystore.setKeyEntry("alias", privateKey, KEYSTORE_PASSWORD.toCharArray(), new Certificate[]{certificate});
 
     return keystore;
   }
 
   private void deployMujinaApps(Server server) throws MalformedURLException {
-    String mujinaIdpUrl = String.format("https://build.surfconext.nl/repository/public/releases/org/surfnet/coin/mujina-idp/%s/mujina-idp-%s.war", MUJINA_VERSION, MUJINA_VERSION);
-    String mujinaSpUrl = String.format("https://build.surfconext.nl/repository/public/releases/org/surfnet/coin/mujina-sp/%s/mujina-sp-%s.war", MUJINA_VERSION, MUJINA_VERSION);
+    String mujinaIdpUrl = String.format("%s/org/surfnet/coin/mujina-idp/%s/mujina-idp-%s.war", MUJINA_REPO_BASE, MUJINA_VERSION, MUJINA_VERSION);
+    String mujinaSpUrl = String.format("%s/org/surfnet/coin/mujina-sp/%s/mujina-sp-%s.war", MUJINA_REPO_BASE, MUJINA_VERSION, MUJINA_VERSION);
     WebAppContext idpWebapp = new WebAppContext();
     idpWebapp.setContextPath("/idp");
 
@@ -164,7 +176,6 @@ public class MujinaServer {
     HandlerList handlers = new HandlerList();
     handlers.setHandlers(new Handler[]{idpWebapp, spWebapp});
     server.setHandler(handlers);
-
   }
 
   public String getLocallyCachedWarFile(URL url) {
@@ -207,6 +218,7 @@ public class MujinaServer {
   }
 
   public void stop() throws Exception {
+    LOG.debug("Tearing down Jetty servlet container");
     server.stop();
   }
 }

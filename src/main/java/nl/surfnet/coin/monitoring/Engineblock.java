@@ -23,7 +23,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.opensaml.saml2.metadata.EntityDescriptor;

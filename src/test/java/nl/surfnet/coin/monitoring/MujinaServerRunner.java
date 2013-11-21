@@ -28,9 +28,9 @@ public class MujinaServerRunner {
 
   @Test
   public void setupServer() throws Exception {
-    String conextDomain = "dev.surfconext.nl";
-    new MujinaServer().setupServer(conextDomain);
+    String conextDomain = "surfconext.nl";
+    new MujinaServer().setupServer(conextDomain, "/monitor-key.pem", "/monitor-cert.pem");
     LOG.debug("Server started, will suspend thread now (sleep for a long long time)");
-    Thread.sleep(1000 * 3600 * 24);
+    Thread.sleep(1000 * 400);
   }
 }

@@ -1,7 +1,7 @@
 SURFConext-monitoring-tests
 ===========================
 
-A standalone application that performs some tests on a running instance of OpenConext.
+A standalone application that performs tests on an OpenConext instance.
 
 Tests performed:
 

@@ -6,7 +6,6 @@ import nl.surfnet.coin.api.client.domain.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -19,23 +18,25 @@ import static org.junit.Assert.*;
  * ApiMonitor.main [API base URL] [Client ID] [Client secret] [person ID to test]
  * </pre>
  */
-public class ApiMonitor {
+public class ApiMonitor extends AbstractMonitor {
 
   private static final Logger LOG = LoggerFactory.getLogger(ApiMonitor.class);
 
   private static final String nonExistingPersonId = "urn:collab:some-nonexisting-org:monitoring-user";
 
+
   public static void main(String[] args) throws Exception {
 
+    new ApiMonitor().monitor();
+
+  }
+
+  public void monitor() {
     try {
-      LOG.debug("Running API monitor. Input parameters: {}", Arrays.asList(args));
-
-      assertEquals("Should have 4 parameters: API base URL, client ID, secret, personId to test", 4, args.length);
-      String apiBaseUrl = args[0];
-      String clientId = args[1];
-      String secret = args[2];
-      String personId = args[3];
-
+      String apiBaseUrl = getProperty("apiBaseUrl");
+      String clientId = getProperty("apiClientId");
+      String secret = getProperty("apiClientSecret");
+      String personId = getProperty("apiPersonId");
 
       OpenConextOAuthClientImpl client = new OpenConextOAuthClientImpl();
 
