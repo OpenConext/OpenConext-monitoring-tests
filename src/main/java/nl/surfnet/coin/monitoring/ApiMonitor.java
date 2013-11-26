@@ -37,6 +37,7 @@ public class ApiMonitor extends AbstractMonitor {
       String clientId = getProperty("apiClientId");
       String secret = getProperty("apiClientSecret");
       String personId = getProperty("apiPersonId");
+      String personFullName = getProperty("apiPersonFullName");
 
       OpenConextOAuthClientImpl client = new OpenConextOAuthClientImpl();
 
@@ -49,7 +50,7 @@ public class ApiMonitor extends AbstractMonitor {
       // Existing user.
       Person person = client.getPerson(personId, null);
       assertNotNull(person);
-      assertEquals("Geert van der Ploeg", person.getDisplayName());
+      assertEquals(personFullName, person.getDisplayName());
 
       // Non-existent user
       try {
