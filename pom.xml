@@ -162,6 +162,11 @@
       <url>dav:https://build.surfconext.nl/repository/private/snapshots</url>
     </snapshotRepository>
   </distributionManagement>
+  <scm>
+    <connection>scm:git:git@github.com:SURFconext/SURFConext-monitoring-tests.git</connection>
+    <url>scm:git:git@github.com:SURFconext/SURFConext-monitoring-tests.git</url>
+    <developerConnection>scm:git:git@github.com:SURFconext/SURFConext-monitoring-tests.git</developerConnection>
+  </scm>
 
   <repositories>
     <repository>
