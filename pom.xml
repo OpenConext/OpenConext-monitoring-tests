@@ -20,7 +20,7 @@
 
   <groupId>org.surfnet.coin</groupId>
 	<artifactId>conext-monitoring-tests</artifactId>
-  <version>3.12.1-SNAPSHOT</version>
+  <version>4.0.0</version>
 
   <properties>
     <jetty.version>8.1.4.v20120524</jetty.version>
