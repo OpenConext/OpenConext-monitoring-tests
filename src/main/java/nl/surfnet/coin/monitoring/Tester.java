@@ -71,7 +71,7 @@ public class Tester {
     assertTrue("Expecting a WAYF. URL was: " + driver.getCurrentUrl(), driver.getPageSource().contains("Login via your institution"));
 
     chooseIdPByLabel(driver, "SURFconext monitoring IdP");
-    mujinaClient.login("monitor-user-" + System.currentTimeMillis(), "somepass");
+    mujinaClient.login("monitor-user", "somepass");
 
     assertTrue("should be on SP, while current URL is: " + driver.getCurrentUrl(), driver.getCurrentUrl().contains("/sp/user.jsp"));
     assertTrue("Should contain SAML attributes", driver.findElement(By.id("assertionAttributes")).getText().contains("j.doe@example.com"));

@@ -2,6 +2,8 @@ package nl.surfnet.coin.monitoring;
 
 import nl.surfnet.coin.api.client.OpenConextOAuthClientImpl;
 import nl.surfnet.coin.api.client.domain.Group;
+import nl.surfnet.coin.api.client.domain.Group20;
+import nl.surfnet.coin.api.client.domain.Group20Entry;
 import nl.surfnet.coin.api.client.domain.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,12 +63,12 @@ public class ApiMonitor extends AbstractMonitor {
       }
 
       // Groups of existing user
-      List<Group> groups = client.getGroups(personId, null);
+      List<Group20> groups = client.getGroups20(personId, null);
       assertNotNull("Groups-call for person " + personId + " should not be null", groups);
 
       // Groups of non-existing user
       try {
-        client.getGroups(nonExistingPersonId, null);
+        client.getGroups20(nonExistingPersonId, null);
         fail("Groups-call with non-existent user should throw exception");
       } catch (RuntimeException e) {
         assertTrue("Response of groups-call with non-existent user should be a 404", e.getMessage().contains("Error response: 404"));
