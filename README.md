@@ -1,4 +1,4 @@
-SURFConext-monitoring-tests
+OpenConext-monitoring-tests
 ===========================
 
 A standalone application that performs tests on an OpenConext instance.
