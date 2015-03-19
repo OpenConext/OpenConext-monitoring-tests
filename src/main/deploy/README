@@ -1,6 +1,24 @@
-# Key/cert created with:
-openssl req -subj '/O=SURFconext monitoring/CN=localhost/' -newkey rsa:2048 -new -x509 -days 3652 -nodes -out monitor-cert.pem -keyout monitor-key.pem
-# Then create DER encoded PKCS8 key:
-openssl pkcs8 -topk8 -in monitor-key.pem -nocrypt -inform PEM -outform DER -out monitor-key.der
-# And create DER encoded cert:
-openssl x509 -outform der -in monitor-cert.pem  -out monitor-cert.der
+To run the monitoring tests there are three shell scripts:
+
+monitor-api.sh
+monitor-metadata.sh
+monitor-saml.sh
+
+To see what the tests assert please read the project README.md on https://github.com/SURFconext/SURFConext-monitoring-tests
+
+Before the tests run there are missing properties to configure in monitor.properties - located in the root of the zip:
+
+engineBlockTrustChainFile
+apiClientId
+apiClientSecret
+apiPersonId
+apiPersonFullName
+
+The monitor-*.sh scripts define the classpath for JAVA and the pre-configured pem files are supposed to be on the classpath. Create a
+directory 'keys' in the same parent folder where you unzipped the conext-monitoring-tests-X-SNAPSHOT-dist.zip and place here the pem files:
+
+engineBlockCertFile
+mujinaPrivateKeyPath
+mujinaCertPath
+
+See the monitor.properties for an explanation. The output of the monitoring scripts must not contain ERROR
