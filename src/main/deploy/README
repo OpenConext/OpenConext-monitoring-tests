@@ -14,6 +14,8 @@ apiClientSecret
 apiPersonId
 apiPersonFullName
 
+For the monitor-saml test to run correctly the Mujina IDP must be named 'OpenConext monitoring IdP' as displayName (both en - en).
+
 The monitor-*.sh scripts define the classpath for JAVA and the pre-configured pem files are supposed to be on the classpath. Create a
 directory 'keys' in the same parent folder where you unzipped the conext-monitoring-tests-X-SNAPSHOT-dist.zip and place here the pem files:
 

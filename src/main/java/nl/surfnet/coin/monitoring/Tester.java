@@ -70,7 +70,7 @@ public class Tester {
     // Expect EB WAYF
     assertTrue("Expecting a WAYF. URL was: " + driver.getCurrentUrl(), driver.getPageSource().contains("Login via your institution"));
 
-    chooseIdPByLabel(driver, "SURFconext monitoring IdP");
+    chooseIdPByLabel(driver, "OpenConext monitoring IdP");
     mujinaClient.login("monitor-user", "somepass");
 
     assertTrue("should be on SP, while current URL is: " + driver.getCurrentUrl(), driver.getCurrentUrl().contains("/sp/user.jsp"));

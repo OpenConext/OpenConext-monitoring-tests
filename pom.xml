@@ -15,11 +15,12 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.surfnet.coin</groupId>
-	<artifactId>conext-monitoring-tests</artifactId>
+  <artifactId>conext-monitoring-tests</artifactId>
   <version>4.0.1-SNAPSHOT</version>
 
   <properties>
@@ -76,7 +77,8 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.10</version>
-      <scope>compile</scope><!-- Needed for runtime tests -->
+      <scope>compile</scope>
+      <!-- Needed for runtime tests -->
     </dependency>
 
     <dependency>
@@ -99,8 +101,8 @@
     <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml</artifactId>
-        <version>2.5.3</version>
-        <!--<version>2.6.4</version>-->
+      <version>2.5.3</version>
+      <!--<version>2.6.4</version>-->
       <exclusions>
         <exclusion>
           <groupId>commons-logging</groupId>
@@ -125,13 +127,31 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.0</version>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>1.4</version>
+        <executions>
+          <execution>
+            <id>enforce-versions</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>3.2.5</version>
+                </requireMavenVersion>
+                <requireJavaVersion>
+                  <version>1.8</version>
+                </requireJavaVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <executions>
@@ -148,25 +168,27 @@
         </configuration>
       </plugin>
     </plugins>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-webdav</artifactId>
+        <version>1.0-beta-2</version>
+      </extension>
+    </extensions>
   </build>
 
   <distributionManagement>
     <repository>
-      <id>surfconext-releases</id>
-      <name>SURFConext private releases repository</name>
-      <url>dav:https://build.surfconext.nl/repository/private/releases</url>
+      <id>openconext-releases</id>
+      <name>OpenConext public releases repository</name>
+      <url>dav:https://build.surfconext.nl/repository/public/releases</url>
     </repository>
     <snapshotRepository>
-      <id>surfconext-snapshots</id>
-      <name>OpenConext private snapshot repository</name>
-      <url>dav:https://build.surfconext.nl/repository/private/snapshots</url>
+      <id>openconext-snapshots</id>
+      <name>OpenConext public snapshot repository</name>
+      <url>dav:https://build.surfconext.nl/repository/public/snapshots</url>
     </snapshotRepository>
   </distributionManagement>
-  <scm>
-    <connection>scm:git:git@github.com:SURFconext/SURFConext-monitoring-tests.git</connection>
-    <url>scm:git:git@github.com:SURFconext/SURFConext-monitoring-tests.git</url>
-    <developerConnection>scm:git:git@github.com:SURFconext/SURFConext-monitoring-tests.git</developerConnection>
-  </scm>
 
   <repositories>
     <repository>
@@ -193,14 +215,5 @@
       <url>https://build.surfconext.nl/repository/public/releases</url>
     </repository>
   </repositories>
-
-  <!--
-
-	<scm>
-		<connection>scm:git:git@github.com:SURFconext/SURFConext-integration-tests.git</connection>
-		<developerConnection>scm:git:git@github.com:SURFconext/SURFConext-integration-tests.git</developerConnection>
-		<url>scm:git:git@github.com:SURFconext/SURFConext-integration-tests.git</url>
-	</scm>
-	-->
 
 </project>
