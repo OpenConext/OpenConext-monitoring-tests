@@ -1,4 +1,4 @@
-Before running the SAML authentication the mujiina IdP and SP used by the test must be added to OpenConext. The instructions below assume you are using the OpenCOnext servieregistry to add the IdP and the SP.
+Before running the SAML authentication the mujiina IdP and SP used by the test must be added to OpenConext. The instructions below assume you are using the OpenConext servieregistry to add the IdP and the SP.
 
 Monitor SP
 ==========
