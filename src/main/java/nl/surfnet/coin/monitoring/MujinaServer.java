@@ -39,6 +39,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.opensaml.util.resource.ClasspathResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,163 +47,166 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.RSAPrivateKey;
 
 /**
  * Container for setting up Mujina SP and Mujina IdP
  */
 public class MujinaServer {
 
-  private static final Logger LOG = LoggerFactory.getLogger(MujinaServer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MujinaServer.class);
 
-  private static final String MUJINA_VERSION = "3.1.0";
+    private static final String MUJINA_VERSION = "3.1.0";
 
-  public static final String KEYSTORE_PASSWORD = "000123";
-  private static final int SSL_PORT = 8443;
-  private static final String SP_ENTITY_ID = "https://monitoring-sp";
-  private static final String IDP_ENTITY_ID = "https://monitoring-idp";
-  public static final String MUJINA_REPO_BASE = "https://build.surfconext.nl/repository/public/releases";
+    public static final String KEYSTORE_PASSWORD = "000123";
+    private static final int SSL_PORT = 8443;
+    private static final String SP_ENTITY_ID = "https://monitoring-sp";
+    private static final String IDP_ENTITY_ID = "https://monitoring-idp";
+    public static final String MUJINA_REPO_BASE = "https://build.surfconext.nl/repository/public/releases";
 
-  private Server server;
-  private X509Certificate certificate;
-  private RSAPrivateKey privateKey;
+    private Server server;
+    private X509Certificate certificate;
+    private KeyPair privateKey;
 
 
-  public URI setupServer(String conextDomain, String privateKeyPath, String certPath) throws Exception {
+    public URI setupServer(String conextDomain, String privateKeyPath, String certPath) throws Exception {
 
-    String baseURI = "https://localhost:" + SSL_PORT;
+        String baseURI = "https://localhost:" + SSL_PORT;
 
-    Security.addProvider(new BouncyCastleProvider());
+        Security.addProvider(new BouncyCastleProvider());
 
-    certificate = (X509Certificate) new PEMReader(new InputStreamReader(new ClasspathResource(certPath).getInputStream())).readObject();
-    privateKey = (RSAPrivateKey) new PEMReader(new InputStreamReader(new ClasspathResource(privateKeyPath).getInputStream())).readObject();
+        certificate = (X509Certificate) new PEMReader(new InputStreamReader(new ClasspathResource(certPath).getInputStream())).readObject();
+        privateKey = (KeyPair) new PEMReader(new InputStreamReader(new ClasspathResource(privateKeyPath).getInputStream())).readObject();
 
-    server = new Server();
+        Assert.notNull(certificate, "Could not properly read certificate:" + certPath);
+        Assert.notNull(certificate, "Could not properly read privateKey:" + privateKeyPath);
 
-    configureSSL(server, SSL_PORT);
+        server = new Server();
 
-    deployMujinaApps(server);
+        configureSSL(server, SSL_PORT);
 
-    server.start();
+        deployMujinaApps(server);
 
-    setSAMLEndpoints(baseURI, conextDomain);
+        server.start();
 
-    return URI.create(baseURI);
-  }
+        setSAMLEndpoints(baseURI, conextDomain);
 
-  /**
-   * Configure Mujina IdP and SP using their respective APIs.
-   *
-   * @throws Exception
-   */
-  private void setSAMLEndpoints(String baseURI, String conextDomain) throws Exception {
-    DefaultHttpClient httpClient = new DefaultHttpClient();
+        return URI.create(baseURI);
+    }
 
-    // SSL socket factory that does not complain about self signed certs.
-    SSLSocketFactory sslsf = new SSLSocketFactory(new TrustStrategy() {
-      public boolean isTrusted(
-              final X509Certificate[] chain, String authType) throws CertificateException {
-        // Oh, I am easy...
-        return true;
-      }
+    /**
+     * Configure Mujina IdP and SP using their respective APIs.
+     *
+     * @throws Exception
+     */
+    private void setSAMLEndpoints(String baseURI, String conextDomain) throws Exception {
+        DefaultHttpClient httpClient = new DefaultHttpClient();
 
-    });
-    httpClient.getConnectionManager().getSchemeRegistry().register(new Scheme("https", SSL_PORT, sslsf));
+        // SSL socket factory that does not complain about self signed certs.
+        SSLSocketFactory sslsf = new SSLSocketFactory(new TrustStrategy() {
+            public boolean isTrusted(
+                    final X509Certificate[] chain, String authType) throws CertificateException {
+                // Oh, I am easy...
+                return true;
+            }
 
-    // Set Engine's URL as the endpoint for Mujina SP
-    HttpPut put = new HttpPut(baseURI + "/sp/api/ssoServiceURL");
-    String ssoServiceUrl = String.format("https://engine.%s/authentication/idp/single-sign-on", conextDomain);
-    put.setEntity(new StringEntity(String.format("{\"value\": \"%s\"}", ssoServiceUrl), ContentType.APPLICATION_JSON));
-    httpClient.execute(put);
+        });
+        httpClient.getConnectionManager().getSchemeRegistry().register(new Scheme("https", SSL_PORT, sslsf));
 
-    put = new HttpPut(baseURI + "/sp/api/assertionConsumerServiceURL");
-    String assertionConsumerUrl = String.format("%s/sp/AssertionConsumerService", baseURI);
-    put.setEntity(new StringEntity(String.format("{\"value\": \"%s\"}", assertionConsumerUrl), ContentType.APPLICATION_JSON));
-    httpClient.execute(put);
+        // Set Engine's URL as the endpoint for Mujina SP
+        HttpPut put = new HttpPut(baseURI + "/sp/api/ssoServiceURL");
+        String ssoServiceUrl = String.format("https://engine.%s/authentication/idp/single-sign-on", conextDomain);
+        put.setEntity(new StringEntity(String.format("{\"value\": \"%s\"}", ssoServiceUrl), ContentType.APPLICATION_JSON));
+        httpClient.execute(put);
 
-    // Set SP Entity ID on Mujina SP
-    put = new HttpPut(baseURI + "/sp/api/entityid");
-    put.setEntity(new StringEntity(String.format("{\"value\": \"%s\"}", SP_ENTITY_ID), ContentType.APPLICATION_JSON));
-    httpClient.execute(put);
+        put = new HttpPut(baseURI + "/sp/api/assertionConsumerServiceURL");
+        String assertionConsumerUrl = String.format("%s/sp/AssertionConsumerService", baseURI);
+        put.setEntity(new StringEntity(String.format("{\"value\": \"%s\"}", assertionConsumerUrl), ContentType.APPLICATION_JSON));
+        httpClient.execute(put);
 
-    // Set Entity ID on Mujina IdP
-    put = new HttpPut(baseURI + "/idp/api/entityid");
-    put.setEntity(new StringEntity(String.format("{\"value\": \"%s\"}", IDP_ENTITY_ID), ContentType.APPLICATION_JSON));
-    httpClient.execute(put);
+        // Set SP Entity ID on Mujina SP
+        put = new HttpPut(baseURI + "/sp/api/entityid");
+        put.setEntity(new StringEntity(String.format("{\"value\": \"%s\"}", SP_ENTITY_ID), ContentType.APPLICATION_JSON));
+        httpClient.execute(put);
 
-    // enable signing by Mujina IdP
-    put = new HttpPut(baseURI + "/idp/api/needs-signing");
-    put.setEntity(new StringEntity(String.format("{\"value\": \"%s\"}", "true"), ContentType.APPLICATION_JSON));
-    httpClient.execute(put);
+        // Set Entity ID on Mujina IdP
+        put = new HttpPut(baseURI + "/idp/api/entityid");
+        put.setEntity(new StringEntity(String.format("{\"value\": \"%s\"}", IDP_ENTITY_ID), ContentType.APPLICATION_JSON));
+        httpClient.execute(put);
 
-    // Set signing credentials on the IdP
-    HttpPost post = new HttpPost(baseURI + "/idp/api/signing-credential");
-    String certificate = new String(Base64.encodeBase64(this.certificate.getEncoded()));
-    String key = new String(Base64.encodeBase64(this.privateKey.getEncoded()));
-    String content = String.format("{\"certificate\": \"%s\", \"key\": \"%s\"}", certificate, key);
-    LOG.debug("Signing content: {}", content);
-    post.setEntity(new StringEntity(content, ContentType.APPLICATION_JSON));
-    HttpResponse response = httpClient.execute(post);
+        // enable signing by Mujina IdP
+        put = new HttpPut(baseURI + "/idp/api/needs-signing");
+        put.setEntity(new StringEntity(String.format("{\"value\": \"%s\"}", "true"), ContentType.APPLICATION_JSON));
+        httpClient.execute(put);
+
+        // Set signing credentials on the IdP
+        HttpPost post = new HttpPost(baseURI + "/idp/api/signing-credential");
+        String certificate = new String(Base64.encodeBase64(this.certificate.getEncoded()));
+        String key = new String(Base64.encodeBase64(this.privateKey.getPrivate().getEncoded()));
+        String content = String.format("{\"certificate\": \"%s\", \"key\": \"%s\"}", certificate, key);
+        LOG.debug("Signing content: {}", content);
+        post.setEntity(new StringEntity(content, ContentType.APPLICATION_JSON));
+        HttpResponse response = httpClient.execute(post);
 //    response.getEntity().writeTo(System.out);
 
-  }
-
-  private KeyStore createKeystore() throws Exception {
-    KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-    keystore.load(null, KEYSTORE_PASSWORD.toCharArray());
-    keystore.setKeyEntry("alias", privateKey, KEYSTORE_PASSWORD.toCharArray(), new Certificate[]{certificate});
-
-    return keystore;
-  }
-
-  private void deployMujinaApps(Server server) throws MalformedURLException {
-    String mujinaIdpUrl = String.format("%s/org/surfnet/coin/mujina-idp/%s/mujina-idp-%s.war", MUJINA_REPO_BASE, MUJINA_VERSION, MUJINA_VERSION);
-    String mujinaSpUrl = String.format("%s/org/surfnet/coin/mujina-sp/%s/mujina-sp-%s.war", MUJINA_REPO_BASE, MUJINA_VERSION, MUJINA_VERSION);
-    WebAppContext idpWebapp = new WebAppContext();
-    idpWebapp.setContextPath("/idp");
-
-    idpWebapp.setWar(getLocallyCachedWarFile(new URL(mujinaIdpUrl)));
-
-    WebAppContext spWebapp = new WebAppContext();
-    spWebapp.setContextPath("/sp");
-
-    spWebapp.setWar(getLocallyCachedWarFile(new URL(mujinaSpUrl)));
-
-    HandlerList handlers = new HandlerList();
-    handlers.setHandlers(new Handler[]{idpWebapp, spWebapp});
-    server.setHandler(handlers);
-  }
-
-  public String getLocallyCachedWarFile(URL url) {
-    String urlPath = url.getPath();
-    File file = new File(FileUtils.getTempDirectoryPath() + "/" + FilenameUtils.getName(urlPath));
-    if (file.exists()) {
-      LOG.debug("File {} exists already (downloaded before), will use this, for given URL {}", file.getPath(), url);
-    } else {
-      LOG.debug("File {} does not exist yet, will download from {}", file.getPath(), url);
-      try {
-        FileUtils.copyURLToFile(url, file);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
     }
-    return file.getPath();
-  }
 
-  public void configureSSL(Server server, int port) throws Exception {
+    private KeyStore createKeystore() throws Exception {
+        KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+        keystore.load(null, KEYSTORE_PASSWORD.toCharArray());
+        keystore.setKeyEntry("alias", privateKey.getPrivate(), KEYSTORE_PASSWORD.toCharArray(), new Certificate[]{certificate});
 
-    SslContextFactory sslContextFactory = new SslContextFactory();
+        return keystore;
+    }
+
+    private void deployMujinaApps(Server server) throws MalformedURLException {
+        String mujinaIdpUrl = String.format("%s/org/surfnet/coin/mujina-idp/%s/mujina-idp-%s.war", MUJINA_REPO_BASE, MUJINA_VERSION, MUJINA_VERSION);
+        String mujinaSpUrl = String.format("%s/org/surfnet/coin/mujina-sp/%s/mujina-sp-%s.war", MUJINA_REPO_BASE, MUJINA_VERSION, MUJINA_VERSION);
+        WebAppContext idpWebapp = new WebAppContext();
+        idpWebapp.setContextPath("/idp");
+
+        idpWebapp.setWar(getLocallyCachedWarFile(new URL(mujinaIdpUrl)));
+
+        WebAppContext spWebapp = new WebAppContext();
+        spWebapp.setContextPath("/sp");
+
+        spWebapp.setWar(getLocallyCachedWarFile(new URL(mujinaSpUrl)));
+
+        HandlerList handlers = new HandlerList();
+        handlers.setHandlers(new Handler[]{idpWebapp, spWebapp});
+        server.setHandler(handlers);
+    }
+
+    public String getLocallyCachedWarFile(URL url) {
+        String urlPath = url.getPath();
+        File file = new File(FileUtils.getTempDirectoryPath() + "/" + FilenameUtils.getName(urlPath));
+        if (file.exists()) {
+            LOG.debug("File {} exists already (downloaded before), will use this, for given URL {}", file.getPath(), url);
+        } else {
+            LOG.debug("File {} does not exist yet, will download from {}", file.getPath(), url);
+            try {
+                FileUtils.copyURLToFile(url, file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return file.getPath();
+    }
+
+    public void configureSSL(Server server, int port) throws Exception {
+
+        SslContextFactory sslContextFactory = new SslContextFactory();
 
 //    SslConnectionFactory sslConnectionFactory = new SslConnectionFactory(sslContextFactory, "http/1.1");
 
-    sslContextFactory.setKeyStore(createKeystore());
-    sslContextFactory.setKeyStorePassword(KEYSTORE_PASSWORD);
-    SslSelectChannelConnector connector = new SslSelectChannelConnector(sslContextFactory);
+        sslContextFactory.setKeyStore(createKeystore());
+        sslContextFactory.setKeyStorePassword(KEYSTORE_PASSWORD);
+        SslSelectChannelConnector connector = new SslSelectChannelConnector(sslContextFactory);
 
 //
 //    HttpConfiguration config = new HttpConfiguration();
@@ -212,13 +216,13 @@ public class MujinaServer {
 //    sslConfiguration.addCustomizer(new SecureRequestCustomizer());
 
 
-    connector.setPort(port);
-    server.addConnector(connector);
+        connector.setPort(port);
+        server.addConnector(connector);
 
-  }
+    }
 
-  public void stop() throws Exception {
-    LOG.debug("Tearing down Jetty servlet container");
-    server.stop();
-  }
+    public void stop() throws Exception {
+        LOG.debug("Tearing down Jetty servlet container");
+        server.stop();
+    }
 }

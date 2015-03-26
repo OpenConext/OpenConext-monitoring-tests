@@ -16,24 +16,20 @@
   ~ limitations under the License.
   -->
 <configuration>
-  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>monitoring.log</file>
+    <append>true</append>
     <encoder>
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
   </appender>
-  <logger name="org.mortbay" level="warn" additivity="false">
-    <appender-ref ref="console" />
-  </logger>
-  <logger name="org.eclipse.jetty" level="warn" additivity="false">
-    <appender-ref ref="console" />
-  </logger>
-  <logger name="nl.surfnet.coin" level="info" additivity="false">
-    <appender-ref ref="console" />
-  </logger>
-  <logger name="org.opensaml" level="warn" additivity="false">
-    <appender-ref ref="console" />
-  </logger>
-  <root level="warn">
-    <appender-ref ref="console"/>
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+  <root level="WARN">
+    <appender-ref ref="CONSOLE"/>
+    <appender-ref ref="FILE"/>
   </root>
 </configuration>
