@@ -19,6 +19,7 @@ package nl.surfnet.coin.monitoring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.BindException;
 import java.net.URI;
 
 
@@ -50,7 +51,11 @@ public class SAMLMonitor extends AbstractMonitor {
       LOG.info("All tests succeeded");
       mujinaServer.stop();
       System.exit(0);
-    } catch (Throwable t) {
+    } catch (BindException e) {
+      LOG.info("Address in use. We terminate normally as this can happen because the previous test is still running");
+      System.exit(0);
+    }
+    catch (Throwable t) {
       LOG.error("Exiting because of exception", t);
       mujinaServer.stop();
       System.exit(2);

@@ -1,6 +1,2 @@
 # Key/cert created with:
 openssl req -subj '/O=SURFconext monitoring/CN=localhost/' -newkey rsa:2048 -new -x509 -days 3652 -nodes -out monitor-cert.pem -keyout monitor-key.pem
-# Then create DER encoded PKCS8 key:
-openssl pkcs8 -topk8 -in monitor-key.pem -nocrypt -inform PEM -outform DER -out monitor-key.der
-# And create DER encoded cert:
-openssl x509 -outform der -in monitor-cert.pem  -out monitor-cert.der

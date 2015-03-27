@@ -49,6 +49,7 @@ import java.net.URI;
 import java.net.URL;
 import java.security.KeyPair;
 import java.security.KeyStore;
+import java.security.PrivateKey;
 import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -71,8 +72,7 @@ public class MujinaServer {
 
     private Server server;
     private X509Certificate certificate;
-    private KeyPair privateKey;
-
+    private PrivateKey privateKey;
 
     public URI setupServer(String conextDomain, String privateKeyPath, String certPath) throws Exception {
 
@@ -80,8 +80,19 @@ public class MujinaServer {
 
         Security.addProvider(new BouncyCastleProvider());
 
+
         certificate = (X509Certificate) new PEMReader(new InputStreamReader(new ClasspathResource(certPath).getInputStream())).readObject();
-        privateKey = (KeyPair) new PEMReader(new InputStreamReader(new ClasspathResource(privateKeyPath).getInputStream())).readObject();
+
+        /*
+         * Breaking non-compatible change of the JDK in combination with the deprecated PEMReader
+         */
+        Object key = new PEMReader(new InputStreamReader(new ClasspathResource(privateKeyPath).getInputStream())).readObject();
+        if (key instanceof KeyPair) {
+            privateKey = ((KeyPair) key).getPrivate();
+        } else {
+            privateKey = (PrivateKey) key;
+        }
+        certificate = (X509Certificate) new PEMReader(new InputStreamReader(new ClasspathResource(certPath).getInputStream())).readObject();
 
         Assert.notNull(certificate, "Could not properly read certificate:" + certPath);
         Assert.notNull(certificate, "Could not properly read privateKey:" + privateKeyPath);
@@ -147,20 +158,18 @@ public class MujinaServer {
         // Set signing credentials on the IdP
         HttpPost post = new HttpPost(baseURI + "/idp/api/signing-credential");
         String certificate = new String(Base64.encodeBase64(this.certificate.getEncoded()));
-        String key = new String(Base64.encodeBase64(this.privateKey.getPrivate().getEncoded()));
+        String key = new String(Base64.encodeBase64(this.privateKey.getEncoded()));
         String content = String.format("{\"certificate\": \"%s\", \"key\": \"%s\"}", certificate, key);
         LOG.debug("Signing content: {}", content);
         post.setEntity(new StringEntity(content, ContentType.APPLICATION_JSON));
         HttpResponse response = httpClient.execute(post);
-//    response.getEntity().writeTo(System.out);
 
     }
 
     private KeyStore createKeystore() throws Exception {
         KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
         keystore.load(null, KEYSTORE_PASSWORD.toCharArray());
-        keystore.setKeyEntry("alias", privateKey.getPrivate(), KEYSTORE_PASSWORD.toCharArray(), new Certificate[]{certificate});
-
+        keystore.setKeyEntry("alias", privateKey, KEYSTORE_PASSWORD.toCharArray(), new Certificate[]{certificate});
         return keystore;
     }
 
@@ -199,23 +208,10 @@ public class MujinaServer {
     }
 
     public void configureSSL(Server server, int port) throws Exception {
-
         SslContextFactory sslContextFactory = new SslContextFactory();
-
-//    SslConnectionFactory sslConnectionFactory = new SslConnectionFactory(sslContextFactory, "http/1.1");
-
         sslContextFactory.setKeyStore(createKeystore());
         sslContextFactory.setKeyStorePassword(KEYSTORE_PASSWORD);
         SslSelectChannelConnector connector = new SslSelectChannelConnector(sslContextFactory);
-
-//
-//    HttpConfiguration config = new HttpConfiguration();
-//    config.setSecureScheme("https");
-//    config.setSecurePort(port);
-//    HttpConfiguration sslConfiguration = new HttpConfiguration(config);
-//    sslConfiguration.addCustomizer(new SecureRequestCustomizer());
-
-
         connector.setPort(port);
         server.addConnector(connector);
 

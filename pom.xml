@@ -145,9 +145,6 @@
                 <requireMavenVersion>
                   <version>3.2.5</version>
                 </requireMavenVersion>
-                <requireJavaVersion>
-                  <version>1.8</version>
-                </requireJavaVersion>
               </rules>
             </configuration>
           </execution>
