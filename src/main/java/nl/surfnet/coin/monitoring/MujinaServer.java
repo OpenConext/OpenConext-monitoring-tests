@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -122,7 +123,6 @@ public class MujinaServer {
         SSLSocketFactory sslsf = new SSLSocketFactory(new TrustStrategy() {
             public boolean isTrusted(
                     final X509Certificate[] chain, String authType) throws CertificateException {
-                // Oh, I am easy...
                 return true;
             }
 
@@ -220,5 +220,23 @@ public class MujinaServer {
     public void stop() throws Exception {
         LOG.debug("Tearing down Jetty servlet container");
         server.stop();
+        cleanup();
+
+    }
+
+    private void cleanup() throws Exception {
+        File tmp = new File(FileUtils.getTempDirectoryPath());
+        File[] files = tmp.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.startsWith("jetty-0.0.0.0-8443-mujina");
+            }
+        });
+        for (final File file : files) {
+            if (!file.delete()) {
+                LOG.debug("can't delete file " + file.getName());
+            }
+        }
+
     }
 }

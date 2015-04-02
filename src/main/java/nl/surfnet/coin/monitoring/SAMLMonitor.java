@@ -52,7 +52,7 @@ public class SAMLMonitor extends AbstractMonitor {
       mujinaServer.stop();
       System.exit(0);
     } catch (BindException e) {
-      LOG.info("Address in use. We terminate normally as this can happen because the previous test is still running");
+      LOG.warn("Address in use. We terminate normally as this can happen because the previous test is still running");
       System.exit(0);
     }
     catch (Throwable t) {
