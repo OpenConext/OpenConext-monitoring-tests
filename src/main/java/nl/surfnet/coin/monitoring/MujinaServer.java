@@ -66,18 +66,19 @@ public class MujinaServer {
     private static final String MUJINA_VERSION = "3.1.0";
 
     public static final String KEYSTORE_PASSWORD = "000123";
-    private static final int SSL_PORT = 8443;
     private static final String SP_ENTITY_ID = "https://monitoring-sp";
     private static final String IDP_ENTITY_ID = "https://monitoring-idp";
     public static final String MUJINA_REPO_BASE = "https://build.surfconext.nl/repository/public/releases";
 
     private Server server;
+    private int sslPort;
     private X509Certificate certificate;
     private PrivateKey privateKey;
 
-    public URI setupServer(String conextDomain, String privateKeyPath, String certPath) throws Exception {
+    public URI setupServer(String conextDomain, String privateKeyPath, String certPath, int sslPort) throws Exception {
 
-        String baseURI = "https://localhost:" + SSL_PORT;
+        this.sslPort = sslPort;
+        String baseURI = "https://localhost:" + sslPort;
 
         Security.addProvider(new BouncyCastleProvider());
 
@@ -100,7 +101,7 @@ public class MujinaServer {
 
         server = new Server();
 
-        configureSSL(server, SSL_PORT);
+        configureSSL(server, sslPort);
 
         deployMujinaApps(server);
 
@@ -127,7 +128,7 @@ public class MujinaServer {
             }
 
         });
-        httpClient.getConnectionManager().getSchemeRegistry().register(new Scheme("https", SSL_PORT, sslsf));
+        httpClient.getConnectionManager().getSchemeRegistry().register(new Scheme("https", sslPort, sslsf));
 
         // Set Engine's URL as the endpoint for Mujina SP
         HttpPut put = new HttpPut(baseURI + "/sp/api/ssoServiceURL");

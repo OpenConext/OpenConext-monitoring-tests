@@ -16,8 +16,10 @@
 
 package nl.surfnet.coin.monitoring;
 
+import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import java.net.BindException;
 import java.net.URI;
@@ -42,10 +44,14 @@ public class SAMLMonitor extends AbstractMonitor {
       String conextDomain = getProperty("conextDomain");
       String privateKeyPath = getProperty("mujinaPrivateKeyPath");
       String certPath = getProperty("mujinaCertPath");
+      String sslPort = getProperty("mujinaSslPort");
+
+      Preconditions.checkArgument(StringUtils.hasText(sslPort), "The sslPort property in monitor.properties is absent");
+
 
       LOG.info("Setting up Jetty servlet container and deploying Mujina IdP and SP");
       mujinaServer = new MujinaServer();
-      URI mujinaBaseUri = mujinaServer.setupServer(conextDomain, privateKeyPath, certPath);
+      URI mujinaBaseUri = mujinaServer.setupServer(conextDomain, privateKeyPath, certPath, Integer.valueOf(sslPort));
       LOG.info("Running tests");
       new Tester(mujinaBaseUri).runTests();
       LOG.info("All tests succeeded");
