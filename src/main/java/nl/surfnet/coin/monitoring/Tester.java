@@ -68,9 +68,9 @@ public class Tester {
     mujinaClient.protectedPage();
 
     // Expect EB WAYF
-    assertTrue("Expecting a WAYF. URL was: " + driver.getCurrentUrl(), driver.getPageSource().contains("Login via your institution"));
+    assertTrue("Expecting a WAYF. URL was: " + driver.getCurrentUrl(), driver.getPageSource().contains("Select an institution to login to the service"));
 
-    chooseIdPByLabel(driver, "OpenConext monitoring IdP");
+    chooseIdPByLabel(driver, "https://monitoring-idp");
     mujinaClient.login("monitor-user", "somepass");
 
     assertTrue("should be on SP, while current URL is: " + driver.getCurrentUrl(), driver.getCurrentUrl().contains("/sp/user.jsp"));
@@ -82,7 +82,7 @@ public class Tester {
    * Choose the IdP that we currently working with
    */
   private void chooseIdPByLabel(WebDriver driver, String label) {
-    final String xpathExpression = String.format("//span[normalize-space()='%s']", StringEscapeUtils.escapeXml(label));
+    final String xpathExpression = String.format("//button[@value='%s']", StringEscapeUtils.escapeXml(label));
     final WebElement element = driver.findElement(By.xpath(xpathExpression));
     element.click();
 
