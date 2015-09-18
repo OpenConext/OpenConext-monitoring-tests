@@ -82,7 +82,7 @@ public class Tester {
    * Choose the IdP that we currently working with
    */
   private void chooseIdPByLabel(WebDriver driver, String label) {
-    final String xpathExpression = String.format("//button[@value='%s']", StringEscapeUtils.escapeXml(label));
+    final String xpathExpression = String.format("//button[@value=\"%s\"]", StringEscapeUtils.escapeXml(label));
     final WebElement element = driver.findElement(By.xpath(xpathExpression));
     element.click();
 
