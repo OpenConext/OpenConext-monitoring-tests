@@ -32,7 +32,6 @@ import static org.junit.Assert.assertTrue;
 
 public class TesterTest {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TesterTest.class);
   private Engineblock engineblock;
 
 

@@ -1,13 +1,13 @@
 OpenConext-monitoring-tests
 ===========================
 
-OpenConext-monitoring-tests provides a standalone Java application that performs tests on an OpenConext instance. The application can perform three different tests that can be used to monitor the availability of a OpenConext (production) instance. Scripts are provided to call the tests from Nagios.
+OpenConext-monitoring-tests provides a standalone Java application that performs tests on an OpenConext instance. The application can perform four different tests that can be used to monitor the availability of a OpenConext (production) instance. Scripts are provided to call the tests from Nagios.
 
 The monitoring application contains an embedded Mujina that provides the SAML IdP and SAML SP used in the tests. Selumium WebDriver is used as webbrowser in the tests.
 
 Available tests
 ===============
-Three different tests are available.
+Four different tests are available.
 
 
 Login flow
@@ -37,6 +37,12 @@ API
 - Perform API call with non-existent person urn and verify 404 response
 - Perform API call to fetch the groups for the person urn configured in monitor.properties
 - Perform API call to fetch the person and compare the displayName with the configured name in monitor.properties
+
+VOOT
+---
+- Get an access-token with client-secret for a SP that is configured with client credentials grant type in the authz-admin server
+- Perform VOOT call with non-existent person urn and verify empty list of groups
+- Perform VOOT call to fetch the groups for the person urn configured in monitor.properties and ensure the result is not empty
 
 Installation
 ============
