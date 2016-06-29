@@ -1,9 +1,10 @@
-To run the monitoring tests there are four shell scripts:
+To run the monitoring tests there are the shell scripts:
 
 monitor-api.sh
 monitor-metadata.sh
 monitor-saml.sh
 monitor-voot.sh
+monitor-pdp.sh
 
 To see what the tests assert please read the project README.md on https://github.com/SURFconext/SURFConext-monitoring-tests
 
@@ -17,6 +18,10 @@ apiPersonFullName
 vootClientId
 vootClientSecret
 vootPersonId
+pdpUserName
+pdpPassword
+spEntityId
+idpEntityId
 
 For the monitor-saml test to run correctly the Mujina IDP must be named 'OpenConext monitoring IdP' as displayName (both en - en).
 

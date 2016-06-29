@@ -44,6 +44,10 @@ VOOT
 - Perform VOOT call with non-existent person urn and verify empty list of groups
 - Perform VOOT call to fetch the groups for the person urn configured in monitor.properties and ensure the result is not empty
 
+PDP
+---
+- Perform pdp policy request with a valid spEntityId and idpEntityId
+
 Installation
 ============
 Running the application requires a Java 7 VM

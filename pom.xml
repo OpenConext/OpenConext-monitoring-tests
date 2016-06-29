@@ -21,7 +21,7 @@
 
   <groupId>org.surfnet.coin</groupId>
   <artifactId>conext-monitoring-tests</artifactId>
-  <version>4.0.2-SNAPSHOT</version>
+  <version>4.0.4</version>
 
   <properties>
     <jetty.version>8.1.4.v20120524</jetty.version>
@@ -104,7 +104,6 @@
       <artifactId>spring-security-oauth2</artifactId>
       <version>${spring-security-oauth2.version}</version>
     </dependency>
-
     <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml</artifactId>
