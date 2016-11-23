@@ -68,7 +68,7 @@ public class MujinaServer {
     public static final String KEYSTORE_PASSWORD = "000123";
     private static final String SP_ENTITY_ID = "https://monitoring-sp";
     private static final String IDP_ENTITY_ID = "https://monitoring-idp";
-    public static final String MUJINA_REPO_BASE = "https://build.surfconext.nl/repository/public/releases";
+    public static final String MUJINA_REPO_BASE = "https://build.openconext.org/repository/public/releases";
 
     private Server server;
     private int sslPort;

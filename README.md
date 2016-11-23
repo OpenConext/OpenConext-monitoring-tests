@@ -52,7 +52,7 @@ Installation
 ============
 Running the application requires a Java 7 VM
 
-Build the application from source or download a prebuild version from: [https://github.com/OpenConext/OpenConext-monitoring-tests/releases](https://github.com/OpenConext/OpenConext-monitoring-tests/releases)
+Build the application from source or download a prebuilt version from: [https://github.com/OpenConext/OpenConext-monitoring-tests/releases](https://github.com/OpenConext/OpenConext-monitoring-tests/releases)
 
 The tests are run using the ```monitor-*.sh``` scripts provided in ```/src/main/deploy```
 
