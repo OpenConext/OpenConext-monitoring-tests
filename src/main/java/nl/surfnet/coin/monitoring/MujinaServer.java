@@ -63,7 +63,7 @@ public class MujinaServer {
 
     private static final Logger LOG = LoggerFactory.getLogger(MujinaServer.class);
 
-    private static final String MUJINA_VERSION = "3.1.0";
+    private static final String MUJINA_VERSION = "4.1.2";
 
     public static final String KEYSTORE_PASSWORD = "000123";
     private static final String SP_ENTITY_ID = "https://monitoring-sp";
@@ -228,7 +228,7 @@ public class MujinaServer {
     private void cleanup() throws Exception {
         File tmp = new File(FileUtils.getTempDirectoryPath());
         File[] files = tmp.listFiles(new FilenameFilter() {
-            @Override
+
             public boolean accept(File dir, String name) {
                 return name.startsWith("jetty-0.0.0.0-8443-mujina");
             }

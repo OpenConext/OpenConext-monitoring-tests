@@ -24,12 +24,13 @@ import org.slf4j.LoggerFactory;
  * The name of this class does not end with Test, to make it not run as a regular unit test. Is is meant only as an integration test helper
  */
 public class MujinaServerRunner {
+
   private static final Logger LOG = LoggerFactory.getLogger(MujinaServerRunner.class);
 
   @Test
   public void setupServer() throws Exception {
-    String conextDomain = "surfconext.nl";
-    new MujinaServer().setupServer(conextDomain, "/monitor-key.pem", "/monitor-cert.pem", 8443);
+    String conextDomain = "test2.surfconext.nl";
+    new MujinaServer().setupServer(conextDomain, "/monitor-key-test.pem", "/monitor-cert-test.pem", 8443);
     LOG.debug("Server started, will suspend thread now (sleep for a long long time)");
     Thread.sleep(1000 * 400);
   }
