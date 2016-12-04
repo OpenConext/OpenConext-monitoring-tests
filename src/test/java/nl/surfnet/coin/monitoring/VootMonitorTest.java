@@ -10,6 +10,6 @@ public class VootMonitorTest {
 
   @Test
   public void testMonitor() throws Exception {
-    subject.doMonitor("test.surfconext.nl", "cool_app_id", "secret", "urn:collab:person:example.com:admin");
+    subject.doMonitor("test2.surfconext.nl", "cool_app_id", "secret", "urn:collab:person:example.com:admin");
   }
 }
