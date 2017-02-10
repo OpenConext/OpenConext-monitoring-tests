@@ -31,61 +31,61 @@ import static org.junit.Assert.assertTrue;
 
 public class Tester {
 
-  private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(Tester.class);
+    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(Tester.class);
 
-  private WebDriver driver;
+    private WebDriver driver;
 
-  private MujinaClient mujinaClient;
+    private MujinaClient mujinaClient;
+    private String idpEntityId;
 
-  public Tester(URI serverBaseUri) throws Exception {
-    driver = new HtmlUnitDriver(true);
-    driver.manage().deleteAllCookies();
-    mujinaClient = new MujinaClient(driver, serverBaseUri);
-  }
-
-  public void runTests() throws IOException {
-
-    try {
-      LOG.info("Running test for login flow using Mujina SP/IdP");
-      loginFlow();
-    } catch (Throwable e) {
-      File tmpFile = File.createTempFile("monitor", ".txt");
-      String output = String.format("Current URL: %s\nPage source:\n%s", driver.getCurrentUrl(), driver.getPageSource());
-      FileUtils.writeStringToFile(tmpFile, output);
-      LOG.info("Caught exception. WebDriver's current state has been dumped in file: {} Will rethrow exception.", tmpFile.getPath());
-      throw new RuntimeException(e);
-    } finally {
-      driver.quit();
+    public Tester(URI serverBaseUri, String idpEntityId, String contextPath) throws Exception {
+        driver = new HtmlUnitDriver(false);
+        driver.manage().deleteAllCookies();
+        mujinaClient = new MujinaClient(driver, serverBaseUri, contextPath);
+        this.idpEntityId = idpEntityId;
     }
-  }
 
-  public void loginFlow() {
-    mujinaClient.spHome();
+    public void runTests() throws IOException {
 
-    LOG.debug("url: {}", driver.getCurrentUrl());
+        try {
+            LOG.info("Running test for login flow using Mujina SP/IdP");
+            loginFlow();
+        } catch (Throwable e) {
+            File tmpFile = File.createTempFile("monitor", ".txt");
+            String output = String.format("Current URL: %s\nPage source:\n%s", driver.getCurrentUrl(), driver.getPageSource());
+            FileUtils.writeStringToFile(tmpFile, output);
+            LOG.info("Caught exception. WebDriver's current state has been dumped in file: {} Will rethrow exception.", tmpFile.getPath());
+            throw new RuntimeException(e);
+        } finally {
+            driver.quit();
+        }
+    }
 
-    // Go to protected page
-    mujinaClient.protectedPage();
+    public void loginFlow() {
+        mujinaClient.spHome();
 
-    // Expect EB WAYF
-    assertTrue("Expecting a WAYF. URL was: " + driver.getCurrentUrl(), driver.getPageSource().contains("Select an institution to login to the service"));
+        LOG.debug("url: {}", driver.getCurrentUrl());
 
-    chooseIdPByLabel(driver, "https://monitoring-idp");
-    mujinaClient.login("monitor-user", "somepass");
+        // Go to protected page
+        mujinaClient.protectedPage();
+        driver.findElement(By.xpath("//input[@value=\"Continue\"]")).click();
 
-    assertTrue("should be on SP, while current URL is: " + driver.getCurrentUrl(), driver.getCurrentUrl().contains("/sp/user.jsp"));
-    assertTrue("Should contain SAML attributes", driver.findElement(By.id("assertionAttributes")).getText().contains("j.doe@example.com"));
-    assertTrue("Should contain my full name", driver.getPageSource().contains("John Doe"));
-  }
 
-  /**
-   * Choose the IdP that we currently working with
-   */
-  private void chooseIdPByLabel(WebDriver driver, String label) {
-    final String xpathExpression = String.format("//a[@data-idp=\"%s\"]", StringEscapeUtils.escapeXml(label));
-    final WebElement element = driver.findElement(By.xpath(xpathExpression));
-    element.click();
+        // Expect EB WAYF
+        assertTrue("Expecting a WAYF. URL was: " + driver.getCurrentUrl(), driver.getPageSource().contains("Select an institution to login to the service"));
 
-  }
+        WebElement login = driver.findElement(By.xpath(String.format("//input[@data-entityid=\"%s\"]", StringEscapeUtils.escapeXml(idpEntityId))));
+        login.click();
+        driver.findElement(By.xpath("//input[@value=\"Submit\"]")).click();
+
+        mujinaClient.login("monitor-user", "somepass");
+
+        driver.findElement(By.xpath("//input[@value=\"Continue\"]")).click();
+        driver.findElement(By.xpath("//input[@value=\"Submit\"]")).click();
+
+        assertTrue("should be on SP, while current URL is: " + driver.getCurrentUrl(), driver.getCurrentUrl().contains("/user.jsp"));
+        assertTrue("Should contain SAML attributes", driver.findElement(By.id("assertionAttributes")).getText().contains("j.doe@example.com"));
+        assertTrue("Should contain my full name", driver.getPageSource().contains("John Doe"));
+    }
 
 }

@@ -24,35 +24,37 @@ import java.net.URI;
 import static org.junit.Assert.assertTrue;
 
 public class MujinaClient {
-  private WebDriver driver;
-  private final URI serverBaseUri;
+    private String contextPath = "/sp";
+    private WebDriver driver;
+    private final URI serverBaseUri;
 
-  public MujinaClient(WebDriver driver, URI serverBaseUri) {
-    this.driver = driver;
-    this.serverBaseUri = serverBaseUri;
-  }
+    public MujinaClient(WebDriver driver, URI serverBaseUri, String contextPath) {
+        this.driver = driver;
+        this.serverBaseUri = serverBaseUri;
+        this.contextPath = contextPath;
+    }
 
-  public void spHome() {
+    public void spHome() {
 
-    driver.get(serverBaseUri + "/sp/index.jsp");
-    assertTrue(driver.getCurrentUrl().contains("/sp/"));
-  }
+        driver.get(serverBaseUri + contextPath + "/index.jsp");
+        assertTrue(driver.getCurrentUrl().contains(contextPath + "/"));
+    }
 
-  public void protectedPage() {
-    driver.get(serverBaseUri + "/sp/user.jsp");
-  }
+    public void protectedPage() {
+        driver.get(serverBaseUri + contextPath + "/user.jsp");
+    }
 
-  public void login(String user, String pass) {
-    driver.findElement(By.name("j_username")).sendKeys(user);
-    driver.findElement(By.name("j_password")).sendKeys(pass);
-    driver.findElement(By.name("login")).submit(); // this is the form
-  }
+    public void login(String user, String pass) {
+        driver.findElement(By.name("j_username")).sendKeys(user);
+        driver.findElement(By.name("j_password")).sendKeys(pass);
+        driver.findElement(By.name("login")).submit(); // this is the form
+    }
 
-  public void deleteCookies() {
-    driver.manage().deleteAllCookies();
-  }
+    public void deleteCookies() {
+        driver.manage().deleteAllCookies();
+    }
 
-  public void setDriver(WebDriver driver) {
-    this.driver = driver;
-  }
+    public void setDriver(WebDriver driver) {
+        this.driver = driver;
+    }
 }

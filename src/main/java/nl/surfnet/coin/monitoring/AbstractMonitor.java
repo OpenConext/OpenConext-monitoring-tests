@@ -48,4 +48,9 @@ public class AbstractMonitor {
     return properties.getProperty(key);
   }
 
+    public String getProperty(String key, String defaultValue) {
+        return properties.getProperty(key, defaultValue);
+    }
+
+
 }

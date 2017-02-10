@@ -34,25 +34,6 @@ public class TesterTest {
 
   private Engineblock engineblock;
 
-
-  @Test
-  @Ignore("Because it needs a running Mujina sp/idp")
-  public void loginFlow() throws Exception {
-
-    WebDriver driver = new FirefoxDriver();
-    driver.manage().deleteAllCookies();
-
-    MujinaClient mujinaClient = new MujinaClient(driver, URI.create("https://localhost:8443"));
-    Engineblock eb = new Engineblock("https://engine.demo.openconext.org", IOUtils.toString(getClass().getResourceAsStream("/engine.demo.openconext.org.pem")), IOUtils.toString(getClass().getResourceAsStream("/openconext_ca.pem")));
-    mujinaClient.protectedPage();
-    eb.chooseIdPByLabel(driver, "monitoring-idp");
-    mujinaClient.login("i-am-a-user-" + System.currentTimeMillis(), "pass");
-    eb.acceptConsentIfPresent(driver);
-    assertTrue("should be on SP", driver.getCurrentUrl().contains("/sp/user.jsp"));
-    assertTrue("Should contain SAML attributes", driver.findElement(By.id("assertionAttributes")).getText().contains("j.doe@example.com"));
-    driver.quit();
-  }
-
   @Before
   public void setup() throws Exception {
     String crt = IOUtils.toString(getClass().getResourceAsStream("/engine.surfconext.nl.pem"));

@@ -48,12 +48,11 @@ public class SAMLMonitor extends AbstractMonitor {
 
       Preconditions.checkArgument(StringUtils.hasText(sslPort), "The sslPort property in monitor.properties is absent");
 
-
       LOG.info("Setting up Jetty servlet container and deploying Mujina IdP and SP");
       mujinaServer = new MujinaServer();
       URI mujinaBaseUri = mujinaServer.setupServer(conextDomain, privateKeyPath, certPath, Integer.valueOf(sslPort));
       LOG.info("Running tests");
-      new Tester(mujinaBaseUri).runTests();
+      new Tester(mujinaBaseUri, "https://monitoring-idp", "/sp").runTests();
       LOG.info("All tests succeeded");
       mujinaServer.stop();
       System.exit(0);
