@@ -28,9 +28,16 @@ import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.jasper.servlet.JasperInitializer;
+
+import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.SimpleInstanceManager;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openssl.PEMReader;
+import org.eclipse.jetty.annotations.ServletContainerInitializersStarter;
+import org.eclipse.jetty.apache.jsp.JettyJasperInitializer;
 import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.plus.annotation.ContainerInitializer;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
@@ -47,6 +54,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -54,6 +62,8 @@ import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Container for setting up Mujina SP and Mujina IdP
@@ -178,17 +188,39 @@ public class MujinaServer {
         String mujinaSpUrl = String.format("%s/org/surfnet/coin/mujina-sp/%s/mujina-sp-%s.war", MUJINA_REPO_BASE, MUJINA_VERSION, MUJINA_VERSION);
         WebAppContext idpWebapp = new WebAppContext();
         idpWebapp.setContextPath("/idp");
+//        idpWebapp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",".*/[^/]*jstl.*\\.jar");
+
+        ServletContainerInitializersStarter starter = new ServletContainerInitializersStarter(idpWebapp);
+
+        idpWebapp.setAttribute("org.eclipse.jetty.containerInitializers", jspInitializers());
+        idpWebapp.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
+
+        idpWebapp.addBean(starter, true);
 
         idpWebapp.setWar(getLocallyCachedWarFile(new URL(mujinaIdpUrl)));
 
         WebAppContext spWebapp = new WebAppContext();
         spWebapp.setContextPath("/sp");
 
+        spWebapp.setAttribute("org.eclipse.jetty.containerInitializers", jspInitializers());
+        spWebapp.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
+
+        spWebapp.addBean(new ServletContainerInitializersStarter(spWebapp), true);
+
+
         spWebapp.setWar(getLocallyCachedWarFile(new URL(mujinaSpUrl)));
 
         HandlerList handlers = new HandlerList();
         handlers.setHandlers(new Handler[]{idpWebapp, spWebapp});
         server.setHandler(handlers);
+    }
+
+    private static List<ContainerInitializer> jspInitializers() {
+        JettyJasperInitializer sci = new JettyJasperInitializer();
+        ContainerInitializer initializer = new ContainerInitializer(sci, null);
+        List<ContainerInitializer> initializers = new ArrayList<ContainerInitializer>();
+        initializers.add(initializer);
+        return initializers;
     }
 
     public String getLocallyCachedWarFile(URL url) {
