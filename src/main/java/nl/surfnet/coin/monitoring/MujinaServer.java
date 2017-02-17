@@ -84,10 +84,10 @@ public class MujinaServer {
     private X509Certificate certificate;
     private PrivateKey privateKey;
 
-    public URI setupServer(String conextDomain, String privateKeyPath, String certPath, int sslPort) throws Exception {
+    public URI setupServer(String conextDomain, String privateKeyPath, String certPath, String uri, int sslPort) throws Exception {
 
         this.sslPort = sslPort;
-        String baseURI = "https://localhost:" + sslPort;
+        String baseURI = uri + ":" + sslPort;
 
         Security.addProvider(new BouncyCastleProvider());
 
@@ -188,7 +188,6 @@ public class MujinaServer {
         String mujinaSpUrl = String.format("%s/org/surfnet/coin/mujina-sp/%s/mujina-sp-%s.war", MUJINA_REPO_BASE, MUJINA_VERSION, MUJINA_VERSION);
         WebAppContext idpWebapp = new WebAppContext();
         idpWebapp.setContextPath("/idp");
-//        idpWebapp.setAttribute("org.eclipse.jetty.server.webapp.ContainerIncludeJarPattern",".*/[^/]*jstl.*\\.jar");
 
         ServletContainerInitializersStarter starter = new ServletContainerInitializersStarter(idpWebapp);
 

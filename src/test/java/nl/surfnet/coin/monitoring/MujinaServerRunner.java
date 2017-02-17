@@ -25,13 +25,13 @@ import org.slf4j.LoggerFactory;
  */
 public class MujinaServerRunner {
 
-  private static final Logger LOG = LoggerFactory.getLogger(MujinaServerRunner.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MujinaServerRunner.class);
 
-  @Test
-  public void setupServer() throws Exception {
-    String conextDomain = "test2.surfconext.nl";
-    new MujinaServer().setupServer(conextDomain, "/monitor-key-test.pem", "/monitor-cert-test.pem", 8443);
-    LOG.debug("Server started, will suspend thread now (sleep for a long long time)");
-    Thread.sleep(1000 * 400);
-  }
+    @Test
+    public void setupServer() throws Exception {
+        String conextDomain = "test2.surfconext.nl";
+        new MujinaServer().setupServer(conextDomain, "/monitor-key-test.pem", "/monitor-cert-test.pem", "https://localhost", 8443);
+        LOG.debug("Server started, will suspend thread now (sleep for a long long time)");
+        Thread.sleep(1000 * 400);
+    }
 }

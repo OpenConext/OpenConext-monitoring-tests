@@ -17,6 +17,13 @@
 package nl.surfnet.coin.monitoring;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -26,30 +33,36 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URI;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 import static org.junit.Assert.assertTrue;
 
 public class TesterTest {
 
-  private Engineblock engineblock;
+    private Engineblock engineblock;
 
-  @Before
-  public void setup() throws Exception {
-    String crt = IOUtils.toString(getClass().getResourceAsStream("/engine.surfconext.nl.pem"));
-    engineblock = new Engineblock("https://engine.surfconext.nl", crt, null);
-  }
+    @Before
+    public void setup() throws Exception {
+        String crt = IOUtils.toString(getClass().getResourceAsStream("/engine.surfconext.nl.pem"));
+        engineblock = new Engineblock("https://engine.surfconext.nl", crt, null);
+    }
 
-  @Test
-  public void validateIdpProxyMetadata() throws Exception {
-    engineblock.validateIdpProxyMetadata();
-  }
-  @Test
-  public void validateIdpsMetadata() throws Exception {
-    engineblock.validateIdpsMetadata();
-  }
-  @Test
-  public void validateSpProxyMetadata() throws Exception {
-    engineblock.validateSpProxyMetadata();
-  }
+    @Test
+    public void validateIdpProxyMetadata() throws Exception {
+        engineblock.validateIdpProxyMetadata();
+    }
+
+    @Test
+    public void validateIdpsMetadata() throws Exception {
+        engineblock.validateIdpsMetadata();
+    }
+
+    @Test
+    public void validateSpProxyMetadata() throws Exception {
+        engineblock.validateSpProxyMetadata();
+    }
+
 }
