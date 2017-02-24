@@ -52,7 +52,7 @@ public class SAMLMonitor extends AbstractMonitor {
       LOG.info("Setting up Jetty servlet container and deploying Mujina IdP and SP");
       mujinaServer = new MujinaServer();
       URI mujinaBaseUri = mujinaServer.setupServer(conextDomain, privateKeyPath, certPath, mujinaUri, Integer.valueOf(sslPort));
-      LOG.info("Running tests");
+      LOG.info("Running tests on mujinaBaseUri: {}", mujinaBaseUri);
       new Tester(mujinaBaseUri, "https://monitoring-idp", "/sp").runTests();
       LOG.info("All tests succeeded");
       mujinaServer.stop();

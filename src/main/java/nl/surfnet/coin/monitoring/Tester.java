@@ -64,7 +64,7 @@ public class Tester {
     public void loginFlow() {
         mujinaClient.spHome();
 
-        LOG.debug("url: {}", driver.getCurrentUrl());
+        LOG.info("loginFlow url: {}", driver.getCurrentUrl());
 
         // Go to protected page
         mujinaClient.protectedPage();
@@ -73,6 +73,8 @@ public class Tester {
 
         // Expect EB WAYF
         assertTrue("Expecting a WAYF. URL was: " + driver.getCurrentUrl(), driver.getPageSource().contains("Select an institution to login to the service"));
+
+        LOG.info("Current WAYF {}", driver.getPageSource());
 
         WebElement login = driver.findElement(By.xpath(String.format("//input[@data-entityid=\"%s\"]", StringEscapeUtils.escapeXml(idpEntityId))));
         login.click();

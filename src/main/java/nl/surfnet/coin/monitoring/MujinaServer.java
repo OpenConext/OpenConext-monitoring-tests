@@ -247,7 +247,7 @@ public class MujinaServer {
         // done. The port for secured communication is also set here.
         HttpConfiguration http_config = new HttpConfiguration();
         http_config.setSecureScheme("https");
-        http_config.setSecurePort(8443);
+        http_config.setSecurePort(port);
         http_config.setOutputBufferSize(32768);
 
         // HTTP connector
@@ -255,10 +255,10 @@ public class MujinaServer {
         // the http configuration we configured above so it can get things like
         // the output buffer size, etc. We also set the port (8080) and
         // configure an idle timeout.
-        ServerConnector http = new ServerConnector(server,
-            new HttpConnectionFactory(http_config));
-        http.setPort(8080);
-        http.setIdleTimeout(30000);
+//        ServerConnector http = new ServerConnector(server,
+//            new HttpConnectionFactory(http_config));
+//        http.setPort(8080);
+//        http.setIdleTimeout(30000);
 
         // SSL Context Factory for HTTPS
         // SSL requires a certificate so we configure a factory for ssl contents
@@ -290,10 +290,10 @@ public class MujinaServer {
         ServerConnector https = new ServerConnector(server,
             new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
             new HttpConnectionFactory(https_config));
-        https.setPort(8443);
+        https.setPort(port);
         https.setIdleTimeout(500000);
 
-        server.addConnector(http);
+       // server.addConnector(http);
         server.addConnector(https);
 
     }
@@ -310,7 +310,7 @@ public class MujinaServer {
         File[] files = tmp.listFiles(new FilenameFilter() {
 
             public boolean accept(File dir, String name) {
-                return name.startsWith("jetty-0.0.0.0-8443-mujina");
+                return name.startsWith("jetty-0.0.0.0");
             }
         });
         for (final File file : files) {
