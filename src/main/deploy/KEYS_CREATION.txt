@@ -1,2 +1,0 @@
-# Key/cert created with:
-openssl req -subj '/O=SURFconext monitoring/CN=localhost/' -newkey rsa:2048 -new -x509 -days 3652 -nodes -out monitor-cert.pem -keyout monitor-key.pem

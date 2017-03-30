@@ -1,0 +1,47 @@
+# The logging configuration. On a real server this will be a file url. e.g. file://{{ mujina_dir }}/logback.xml
+logging:
+  config: classpath:logback.xml
+
+server:
+  # The port to where this Spring Boot application listens to. e.g. http://localhost:{{ springapp_tcpport }}
+  port: 9000
+  # The context path of the server. You can skip this value in the overriding application.yml on the classpath
+  contextPath:
+
+eb:
+  metadata_base_url: https://engine.test2.surfconext.nl
+  mujina_sp_base_url: https://mujina-sp.test2.surfconext.nl
+  mujina_idp_entity_id: http://mock-idp
+  mujina_username: monitor-user
+
+pdp:
+  user: pdp_admin
+  password: secret
+  idp_entity_id: https://engine.test2.surfconext.nl/authentication/idp/metadata
+  sp_entity_id: https://engine.test2.surfconext.nl/authentication/sp/metadata
+  base_url: https://pdp.test2.surfconext.nl
+
+voot:
+  authz_server_base_url: https://authz.test2.surfconext.nl
+  voot_base_url: https://voot.test2.surfconext.nl
+  client_id: cool_app_id
+  secret: secret
+  person_id: urn:collab:person:example.com:admin
+
+# We disable all endpoints except health for the load-balancer and info for git information.
+endpoints:
+  enabled: false
+  health:
+    enabled: true
+  info:
+    enabled: true
+
+# used by the git plugin
+info:
+  build:
+    artifact: "@project.artifactId@"
+    version: "@project.version@"
+security:
+  user:
+    name: user
+    password: secret
