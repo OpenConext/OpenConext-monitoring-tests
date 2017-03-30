@@ -26,11 +26,13 @@ public class SamlProxyMonitor implements Monitor{
         this.userName = userName;
         this.idpEntityId = idpEntityId;
         driver = new HtmlUnitDriver(false);
-        driver.manage().deleteAllCookies();
+
     }
 
     @Override
     public void monitor() throws Exception {
+        driver.manage().deleteAllCookies();
+        
         driver.get(mujinaServiceProviderBaseUrl + "/user.html");
 
         assertTrue("Expecting a WAYF. URL was: " + driver.getCurrentUrl(),
