@@ -32,7 +32,7 @@ public class SamlProxyMonitor implements Monitor{
     @Override
     public void monitor() throws Exception {
         driver.manage().deleteAllCookies();
-        
+
         driver.get(mujinaServiceProviderBaseUrl + "/user.html");
 
         assertTrue("Expecting a WAYF. URL was: " + driver.getCurrentUrl(),

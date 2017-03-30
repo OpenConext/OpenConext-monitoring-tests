@@ -1,21 +1,19 @@
 OpenConext-monitoring-tests
 ===========================
 
-OpenConext-monitoring-tests provides a standalone Java application that performs tests on an OpenConext instance. The application can perform four different tests that can be used to monitor the availability of a OpenConext (production) instance. Scripts are provided to call the tests from Nagios.
+OpenConext-monitoring-tests provides a standalone Spring Boot Java application that performs tests on an OpenConext instance. 
+The application can performs different health check tests that can be used to monitor the availability of a OpenConext (production) instance. 
 
-The monitoring application contains an embedded Mujina that provides the SAML IdP and SAML SP used in the tests. Selumium WebDriver is used as webbrowser in the tests.
+The health endpoint is available on 'http://localhost:9000/health' and is secured with username / password.
 
 Available tests
 ===============
 Four different tests are available.
 
-
 Login flow
 ----------
 Test a complete SAML authentication of a user
 
-- Start an embedded Jetty servlet container
-- Deploy Mujina IdP and Mujina SP
 - Use WebDriver to test the SAML login-flow
   - Login into a protected page on Mujina SP
   - Choose the 'SURFconext monitoring IdP' IdP from the WAYF
@@ -27,16 +25,7 @@ Metadata
   - IdP proxy metadata
   - SP proxy metadata
   - IdPs metadata
-- Validate the downloaded metadata using the SAML metadata XSDs
-- Verify the XML signature on the metadata
-- Validate that the metadata was signed using the certificate configured in the test
-
-API
----
-- Get an access-token with client-secret for a SP that is configured with client credentials grant type
-- Perform API call with non-existent person urn and verify 404 response
-- Perform API call to fetch the groups for the person urn configured in monitor.properties
-- Perform API call to fetch the person and compare the displayName with the configured name in monitor.properties
+- Validate the validUntil date's
 
 VOOT
 ---
@@ -46,20 +35,21 @@ VOOT
 
 PDP
 ---
-- Perform pdp policy request with a valid spEntityId and idpEntityId
+- Perform pdp policy request with a spEntityId and idpEntityId
 
 Installation
 ============
-Running the application requires a Java 7 VM
+Running the application locally requires a Java 8 VM:
 
-Build the application from source or download a prebuilt version from: [https://github.com/OpenConext/OpenConext-monitoring-tests/releases](https://github.com/OpenConext/OpenConext-monitoring-tests/releases)
-
-The tests are run using the ```monitor-*.sh``` scripts provided in ```/src/main/deploy```
+```bash
+mvn clean install
+mvn spring-boot:run
+curl -u user:secret 'http://localhost:9000/health'
+```
 
 Before running the tests:
 
-* Create a certificate and private key for use by the monitoring test. Refer to ```KEYS_CREATION.txt``` in ```/src/main/deploy```.
-* Add the monitoring IdP and SP in the serviceregistry of the OpenConext instance to monitor. Refer to ```OPENCONEXT_CONFIGURATION.md``` in ```/src/main/deploy```.
-* Configure ```monitor.properties``` in ```/src/main/deploy```. Refer to ```README``` in ```/src/main/deploy```.
+* Add the monitoring IdP and SP in the serviceregistry of the OpenConext instance to monitor. 
+* Configure the correct keys / values using Ansible and overwrite the defaults from application.properties
 
 
