@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import static org.junit.Assert.assertTrue;
 
 @Component
-public class SamlProxyMonitor implements Monitor{
+public class SamlProxyMonitor implements Monitor {
 
     private WebDriver driver;
     private String mujinaServiceProviderBaseUrl;
@@ -40,7 +40,7 @@ public class SamlProxyMonitor implements Monitor{
 
         WebElement login = driver.findElement(
             By.xpath(String.format("//input[@data-entityid=\"%s\"]",
-            StringEscapeUtils.escapeXml11(idpEntityId))));
+                StringEscapeUtils.escapeXml11(idpEntityId))));
         login.click();
 
         driver.findElement(By.xpath("//input[@value=\"Submit\"]")).click();

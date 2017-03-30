@@ -23,11 +23,11 @@ public class VootMonitor implements Monitor {
     private String secret;
     private String personId;
 
-    public VootMonitor(@Value("${voot.authz_server_base_url}") String  authzServerBaseUrl,
+    public VootMonitor(@Value("${voot.authz_server_base_url}") String authzServerBaseUrl,
                        @Value("${voot.voot_base_url}") String vootBaseUrl,
                        @Value("${voot.client_id}") String clientId,
                        @Value("${voot.secret}") String secret,
-                       @Value("${voot.person_id}")String personId) {
+                       @Value("${voot.person_id}") String personId) {
         this.authzServerBaseUrl = authzServerBaseUrl;
         this.vootBaseUrl = vootBaseUrl;
         this.clientId = clientId;

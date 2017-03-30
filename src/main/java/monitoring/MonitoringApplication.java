@@ -6,13 +6,13 @@ import org.springframework.boot.actuate.autoconfigure.TraceWebFilterAutoConfigur
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication(exclude = {
-  TraceWebFilterAutoConfiguration.class,
-  MetricFilterAutoConfiguration.class
+    TraceWebFilterAutoConfiguration.class,
+    MetricFilterAutoConfiguration.class
 })
 public class MonitoringApplication {
 
-  public static void main(String[] args) {
-    SpringApplication.run(MonitoringApplication.class, args);
-  }
+    public static void main(String[] args) {
+        SpringApplication.run(MonitoringApplication.class, args);
+    }
 
 }

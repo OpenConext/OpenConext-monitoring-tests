@@ -18,7 +18,7 @@ public class SamlProxyMonitorTest {
 
     private void doMonitor(String userName) throws Exception {
         new SamlProxyMonitor(
-            "https://mujina-sp.test2.surfconext.nl","http://mock-idp",
+            "https://mujina-sp.test2.surfconext.nl", "http://mock-idp",
             userName).monitor();
     }
 }

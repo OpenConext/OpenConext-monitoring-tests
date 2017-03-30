@@ -48,7 +48,7 @@ public class PdPMonitor implements Monitor {
         HttpEntity httpEntity = new HttpEntity(body, headers);
         ResponseEntity<String> response = restTemplate.exchange(pdpBaseUrl + "/pdp/api/decide/policy", HttpMethod.POST, httpEntity, String.class);
 
-        assertEquals("The response status must be 200",200, response.getStatusCode().value());
+        assertEquals("The response status must be 200", 200, response.getStatusCode().value());
         assertTrue("The body must contain 'urn:oasis:names:tc:xacml:1.0:status:ok'", response.getBody().contains("urn:oasis:names:tc:xacml:1.0:status:ok"));
         assertTrue("The body must contain 'NotApplicable'", response.getBody().contains("NotApplicable"));
     }
