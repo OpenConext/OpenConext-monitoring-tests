@@ -26,11 +26,10 @@ public class SamlProxyMonitor implements Monitor {
         this.userName = userName;
         this.idpEntityId = idpEntityId;
         driver = new HtmlUnitDriver(false);
-
     }
 
     @Override
-    public void monitor()  {
+    public void monitor() {
         try {
             doMonitor();
         } catch (RuntimeException e) {
