@@ -15,9 +15,12 @@ public interface Monitor extends HealthIndicator {
         try {
             monitor();
             return Health.up().build();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             LOG.error("Exception in health " + getClass(), e);
-            return Health.down().withException(e).build();
+            return Health.down().withDetail(
+                String.format("Error in monitor %s", getClass()),
+                e.getMessage()
+            ).build();
         }
     }
 }

@@ -5,7 +5,7 @@
 
     <groupId>org.openconext</groupId>
     <artifactId>monitoring-tests</artifactId>
-    <version>6.0.0</version>
+    <version>6.0.3</version>
     <packaging>jar</packaging>
 
     <name>monitoring-tests</name>

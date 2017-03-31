@@ -30,18 +30,27 @@ public class SamlProxyMonitor implements Monitor {
     }
 
     @Override
-    public void monitor() throws Exception {
+    public void monitor()  {
+        try {
+            doMonitor();
+        } catch (RuntimeException e) {
+            LOG.warn("Exception occurred. Current page is {} and pageSource is {}", driver.getCurrentUrl(), driver.getPageSource());
+            throw e;
+        }
+    }
+
+    private void doMonitor() {
         driver.manage().deleteAllCookies();
 
         driver.get(mujinaServiceProviderBaseUrl + "/user.html");
 
-        assertTrue("Expecting a WAYF. URL was: " + driver.getCurrentUrl(),
-            driver.getPageSource().contains("Select an institution to login to the service"));
-
-        WebElement login = driver.findElement(
-            By.xpath(String.format("//input[@data-entityid=\"%s\"]",
-                StringEscapeUtils.escapeXml11(idpEntityId))));
-        login.click();
+        boolean wayf = driver.getPageSource().contains("Select an institution to login to the service");
+        if (wayf) {
+            WebElement login = driver.findElement(
+                By.xpath(String.format("//input[@data-entityid=\"%s\"]",
+                    StringEscapeUtils.escapeXml11(idpEntityId))));
+            login.click();
+        }
 
         driver.findElement(By.xpath("//input[@value=\"Submit\"]")).click();
 
