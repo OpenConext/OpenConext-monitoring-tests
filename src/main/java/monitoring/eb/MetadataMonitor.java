@@ -13,22 +13,26 @@ import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.time.ZoneId.systemDefault;
+import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @Component
 public class MetadataMonitor implements Monitor {
 
+    private RestTemplate restTemplate;
     private String engineBlockMetatadaBaseUrl;
     private Pattern pattern = Pattern.compile("validUntil=\"(.*?)\"");
+    private DateTimeFormatter dateTimeFormatter = ISO_INSTANT.withZone(systemDefault());
 
     public MetadataMonitor(@Value("${eb.metadata_base_url}") String engineBlockMetatadaBaseUrl) {
         this.engineBlockMetatadaBaseUrl = engineBlockMetatadaBaseUrl;
+        this.restTemplate = new RestTemplate();
     }
 
     @Override
     public void monitor() throws Exception {
-        RestTemplate restTemplate = new RestTemplate();
         metadata(restTemplate, "/authentication/idp/metadata");
         metadata(restTemplate, "/authentication/sp/metadata");
     }
@@ -39,7 +43,7 @@ public class MetadataMonitor implements Monitor {
 
         assertEquals("EngineBlock IDP metadata", HttpStatus.OK, responseEntity.getStatusCode());
 
-        ZonedDateTime halfDayFromNow = ZonedDateTime.now(ZoneId.systemDefault()).plusHours(12);
+        ZonedDateTime halfDayFromNow = ZonedDateTime.now(systemDefault()).plusHours(12);
         assertTrue("validUntil of the metadata should be at least 12 hrs in future",
             validUntil(responseEntity.getBody()).isAfter(halfDayFromNow));
     }
@@ -49,7 +53,6 @@ public class MetadataMonitor implements Monitor {
         matcher.find();
 
         String validUntil = matcher.group(1);
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_INSTANT.withZone(ZoneId.systemDefault());
         return ZonedDateTime.parse(validUntil, dateTimeFormatter);
     }
 

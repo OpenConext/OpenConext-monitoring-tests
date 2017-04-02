@@ -50,6 +50,6 @@ curl -u user:secret 'http://localhost:9000/health'
 Before running the tests:
 
 * Add the monitoring IdP and SP in the serviceregistry of the OpenConext instance to monitor. 
-* Configure the correct keys / values using Ansible and overwrite the defaults from application.properties
+* Configure the monitoring properties using Ansible and overwrite the defaults from application.yml
 
 
