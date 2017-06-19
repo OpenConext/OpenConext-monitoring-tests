@@ -12,23 +12,22 @@ import java.util.List;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-@Component
-public class VootMonitor implements Monitor {
+public abstract class AbstractVootMonitor implements Monitor {
 
     private static final String nonExistingPersonId = "urn:collab:person:some-nonexisting-org:monitoring-user";
 
-    private String authzServerBaseUrl;
+    private String authorizationURL;
     private String vootBaseUrl;
     private String clientId;
     private String secret;
     private String personId;
 
-    public VootMonitor(@Value("${voot.authz_server_base_url}") String authzServerBaseUrl,
-                       @Value("${voot.voot_base_url}") String vootBaseUrl,
-                       @Value("${voot.client_id}") String clientId,
-                       @Value("${voot.secret}") String secret,
-                       @Value("${voot.person_id}") String personId) {
-        this.authzServerBaseUrl = authzServerBaseUrl;
+    protected AbstractVootMonitor(String authorizationURL,
+                               String vootBaseUrl,
+                               String clientId,
+                               String secret,
+                               String personId) {
+        this.authorizationURL = authorizationURL;
         this.vootBaseUrl = vootBaseUrl;
         this.clientId = clientId;
         this.secret = secret;
@@ -38,7 +37,7 @@ public class VootMonitor implements Monitor {
     @Override
     public void monitor() throws Exception {
         ClientCredentialsResourceDetails details = new ClientCredentialsResourceDetails();
-        details.setAccessTokenUri(authzServerBaseUrl + "/oauth/token");
+        details.setAccessTokenUri(authorizationURL);
         details.setClientId(clientId);
         details.setClientSecret(secret);
         details.setScope(Collections.singletonList("groups"));
@@ -52,6 +51,5 @@ public class VootMonitor implements Monitor {
 
         groups = template.getForObject(url, List.class, nonExistingPersonId);
         assertTrue(nonExistingPersonId + " must not have memberships", groups.isEmpty());
-
     }
 }

@@ -22,11 +22,18 @@ pdp:
   base_url: https://pdp.test2.surfconext.nl
 
 voot:
-  authz_server_base_url: https://authz.test2.surfconext.nl
-  voot_base_url: https://voot.test2.surfconext.nl
-  client_id: cool_app_id
-  secret: secret
-  person_id: urn:collab:person:example.com:admin
+  authz:
+    authorization_url: https://authz.test2.surfconext.nl/oauth/token
+    voot_base_url: https://voot.test2.surfconext.nl
+    client_id: cool_app_id
+    secret: secret
+    person_id: urn:collab:person:example.com:admin
+  oidc:
+    authorization_url: https://oidc.test2.surfconext.nl/token
+    voot_base_url: https://voot.test2.surfconext.nl
+    client_id: https@//authz-playground.test2.surfconext.nl
+    secret: secret
+    person_id: urn:collab:person:example.com:admin
 
 # We disable all endpoints except health for the load-balancer and info for git information.
 endpoints:

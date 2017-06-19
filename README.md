@@ -32,6 +32,7 @@ VOOT
 - Get an access-token with client-secret for a SP that is configured with client credentials grant type in the authz-admin server
 - Perform VOOT call with non-existent person urn and verify empty list of groups
 - Perform VOOT call to fetch the groups for the person urn configured in monitor.properties and ensure the result is not empty
+- Perform the above steps for a SP that is configured with client credentials grant type in the oidc server
 
 PDP
 ---
