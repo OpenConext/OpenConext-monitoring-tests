@@ -8,7 +8,7 @@ public class SamlProxyMonitorTest {
 
     @Test
     public void monitor() throws Exception {
-        doMonitor("monitor-user");
+        doMonitor("admin");
     }
 
     @Test
