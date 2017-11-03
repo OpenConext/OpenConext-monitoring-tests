@@ -25,7 +25,6 @@ public class SamlProxyMonitor implements Monitor {
         this.mujinaServiceProviderBaseUrl = mujinaServiceProviderBaseUrl;
         this.userName = userName;
         this.idpEntityId = idpEntityId;
-        driver = new HtmlUnitDriver(false);
     }
 
     @Override
@@ -39,7 +38,7 @@ public class SamlProxyMonitor implements Monitor {
     }
 
     private void doMonitor() {
-        driver.manage().deleteAllCookies();
+        driver = new HtmlUnitDriver(false);
 
         driver.get(mujinaServiceProviderBaseUrl + "/user.html");
 
