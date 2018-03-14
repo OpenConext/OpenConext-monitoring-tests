@@ -9,6 +9,8 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.TimeUnit;
+
 import static org.junit.Assert.assertTrue;
 
 @Component
@@ -39,6 +41,8 @@ public class SamlProxyMonitor implements Monitor {
 
     private void doMonitor() {
         driver = new HtmlUnitDriver(false);
+        driver.manage().deleteAllCookies();
+        driver.manage().timeouts().implicitlyWait(1, TimeUnit.MINUTES);
 
         driver.get(mujinaServiceProviderBaseUrl + "/user.html");
 
