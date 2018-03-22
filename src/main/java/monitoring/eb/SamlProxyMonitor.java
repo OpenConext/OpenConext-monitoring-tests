@@ -42,7 +42,9 @@ public class SamlProxyMonitor implements Monitor {
     private void doMonitor() {
         driver = new HtmlUnitDriver(false);
         driver.manage().deleteAllCookies();
-        driver.manage().timeouts().implicitlyWait(1, TimeUnit.MINUTES);
+        driver.manage().timeouts().implicitlyWait(5, TimeUnit.MINUTES);
+        driver.manage().timeouts().pageLoadTimeout(5, TimeUnit.MINUTES);
+        driver.manage().timeouts().setScriptTimeout(5, TimeUnit.MINUTES);
 
         driver.get(mujinaServiceProviderBaseUrl + "/user.html");
 
