@@ -34,7 +34,8 @@ public class SamlProxyMonitor implements Monitor {
         try {
             doMonitor();
         } catch (RuntimeException e) {
-            LOG.warn("Exception occurred. Current page is {} and pageSource is {}", driver.getCurrentUrl(), driver.getPageSource());
+            LOG.warn("Exception occurred. Current page is {} and pageSource is {}", driver.getCurrentUrl(), driver
+                .getPageSource());
             throw e;
         }
     }
@@ -42,9 +43,10 @@ public class SamlProxyMonitor implements Monitor {
     private void doMonitor() {
         driver = new HtmlUnitDriver(false);
         driver.manage().deleteAllCookies();
-        driver.manage().timeouts().implicitlyWait(5, TimeUnit.MINUTES);
-        driver.manage().timeouts().pageLoadTimeout(5, TimeUnit.MINUTES);
-        driver.manage().timeouts().setScriptTimeout(5, TimeUnit.MINUTES);
+        driver.manage().timeouts()
+            .implicitlyWait(5, TimeUnit.MINUTES)
+            .pageLoadTimeout(5, TimeUnit.MINUTES)
+            .setScriptTimeout(5, TimeUnit.MINUTES);
 
         driver.get(mujinaServiceProviderBaseUrl + "/user.html");
 
@@ -71,11 +73,11 @@ public class SamlProxyMonitor implements Monitor {
 
         driver.findElement(By.xpath("//input[@value=\"Submit\"]")).click();
 
-        String currentUrl = driver.getCurrentUrl();
+        //force the time-out to wait for the page load
+        driver.findElement(By.className("attributes"));
 
-        assertTrue("should be on SP, while current URL is: " + currentUrl,
-            currentUrl.contains("/user.html"));
-        assertTrue("Should contain j.doe@example.com",
-            driver.getPageSource().contains("j.doe@example.com"));
+        String pageSource = driver.getPageSource();
+        assertTrue(String.format("Page should contain %s j.doe@example.com", pageSource),
+            pageSource.contains("j.doe@example.com"));
     }
 }

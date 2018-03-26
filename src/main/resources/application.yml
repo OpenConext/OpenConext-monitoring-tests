@@ -25,7 +25,7 @@ voot:
   authz:
     authorization_url: https://authz.test2.surfconext.nl/oauth/token
     voot_base_url: https://voot.test2.surfconext.nl
-    client_id: cool_app_id
+    client_id: engineblock
     secret: secret
     person_id: urn:collab:person:example.com:admin
   oidc:

@@ -3,6 +3,7 @@ package monitoring.voot;
 import monitoring.Monitor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.resource.OAuth2AccessDeniedException;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +36,11 @@ public abstract class AbstractVootMonitor implements Monitor {
     }
 
     @Override
-    public void monitor() throws Exception {
+    public void monitor()  {
+        doMonitor(true, 1);
+    }
+
+    private void doMonitor(boolean retry, int count) {
         ClientCredentialsResourceDetails details = new ClientCredentialsResourceDetails();
         details.setAccessTokenUri(authorizationURL);
         details.setClientId(clientId);
@@ -45,11 +50,19 @@ public abstract class AbstractVootMonitor implements Monitor {
         OAuth2RestTemplate template = new OAuth2RestTemplate(details);
 
         String url = vootBaseUrl + "/internal/groups/{userId}";
+        try {
+            List groups = template.getForObject(url, List.class, personId);
+            assertFalse(personId + " must have group memberships", groups.isEmpty());
 
-        List groups = template.getForObject(url, List.class, personId);
-        assertFalse(personId + " must have group memberships", groups.isEmpty());
+            groups = template.getForObject(url, List.class, nonExistingPersonId);
+            assertTrue(nonExistingPersonId + " must not have memberships", groups.isEmpty());
+        } catch (RuntimeException e) {
+            if (retry) {
+                this.doMonitor(count < 5, count + 1);
+            } else {
+                throw e;
+            }
 
-        groups = template.getForObject(url, List.class, nonExistingPersonId);
-        assertTrue(nonExistingPersonId + " must not have memberships", groups.isEmpty());
+        }
     }
 }
