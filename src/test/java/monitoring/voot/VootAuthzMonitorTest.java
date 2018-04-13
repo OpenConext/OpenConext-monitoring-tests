@@ -5,7 +5,7 @@ import org.junit.Test;
 public class VootAuthzMonitorTest {
 
     @Test
-    public void testMonitor() {
+    public void testMonitor() throws InterruptedException {
         new VootAuthzMonitor(
             "https://authz.test2.surfconext.nl/oauth/token",
             "https://voot.test2.surfconext.nl",

@@ -37,7 +37,7 @@ public abstract class AbstractVootMonitor implements Monitor {
     }
 
     @Override
-    public void monitor()  {
+    public void monitor() throws InterruptedException {
         ClientCredentialsResourceDetails details = new ClientCredentialsResourceDetails();
         details.setAccessTokenUri(authorizationURL);
         details.setClientId(clientId);
@@ -47,7 +47,7 @@ public abstract class AbstractVootMonitor implements Monitor {
         OAuth2RestTemplate template = new OAuth2RestTemplate(details);
         //pre-populate to enforce caching and allow for retry with the already obtained accessToken
         template.getAccessToken();
-
+        Thread.sleep(2500);
         doMonitor(true, 1, template);
     }
 
