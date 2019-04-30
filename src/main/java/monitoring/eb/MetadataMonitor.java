@@ -22,23 +22,25 @@ import static org.junit.Assert.assertTrue;
 public class MetadataMonitor implements Monitor {
 
     private RestTemplate restTemplate;
-    private String engineBlockMetatadaBaseUrl;
+    private String engineBlockIdpMetatadaUrl;
+    private String engineBlockSpMetatadaUrl;
     private Pattern pattern = Pattern.compile("validUntil=\"(.*?)\"");
     private DateTimeFormatter dateTimeFormatter = ISO_INSTANT.withZone(systemDefault());
 
-    public MetadataMonitor(@Value("${eb.metadata_base_url}") String engineBlockMetatadaBaseUrl) {
-        this.engineBlockMetatadaBaseUrl = engineBlockMetatadaBaseUrl;
+    public MetadataMonitor(@Value("${eb.metadata_sp_url}") String engineBlockIdpMetatadaUrl,
+                           @Value("${eb.metadata_idp_url}") String engineBlockSpMetatadaUrl) {
+        this.engineBlockIdpMetatadaUrl = engineBlockIdpMetatadaUrl;
+        this.engineBlockSpMetatadaUrl = engineBlockSpMetatadaUrl;
         this.restTemplate = new RestTemplate();
     }
 
     @Override
     public void monitor() throws Exception {
-        metadata(restTemplate, "/authentication/idp/metadata");
-        metadata(restTemplate, "/authentication/sp/metadata");
+        metadata(restTemplate, this.engineBlockIdpMetatadaUrl);
+        metadata(restTemplate, this.engineBlockSpMetatadaUrl);
     }
 
-    private void metadata(RestTemplate restTemplate, String path) {
-        String url = engineBlockMetatadaBaseUrl + path;
+    private void metadata(RestTemplate restTemplate, String url) {
         ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
 
         assertEquals("EngineBlock IDP metadata", HttpStatus.OK, responseEntity.getStatusCode());

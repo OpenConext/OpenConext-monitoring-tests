@@ -9,7 +9,8 @@ server:
   contextPath:
 
 eb:
-  metadata_base_url: https://engine.test2.surfconext.nl
+  metadata_idp_url: https://engine.test2.surfconext.nl/authentication/idp/metadata
+  metadata_sp_url: https://engine.test2.surfconext.nl/authentication/sp/metadata
   mujina_sp_base_url: https://mujina-sp.test2.surfconext.nl
   mujina_idp_entity_id: http://mock-idp
   mujina_username: monitor-user
