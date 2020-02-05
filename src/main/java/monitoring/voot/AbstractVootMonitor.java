@@ -1,12 +1,8 @@
 package monitoring.voot;
 
 import monitoring.Monitor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
-import org.springframework.security.oauth2.client.resource.OAuth2AccessDeniedException;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
-import org.springframework.security.oauth2.common.OAuth2AccessToken;
-import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
@@ -25,10 +21,10 @@ public abstract class AbstractVootMonitor implements Monitor {
     private String personId;
 
     protected AbstractVootMonitor(String authorizationURL,
-                               String vootBaseUrl,
-                               String clientId,
-                               String secret,
-                               String personId) {
+                                  String vootBaseUrl,
+                                  String clientId,
+                                  String secret,
+                                  String personId) {
         this.authorizationURL = authorizationURL;
         this.vootBaseUrl = vootBaseUrl;
         this.clientId = clientId;

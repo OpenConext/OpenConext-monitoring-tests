@@ -18,8 +18,8 @@ public interface Monitor extends HealthIndicator {
         } catch (Throwable e) {
             LOG.error("Exception in health " + getClass(), e);
             return Health.down().withDetail(
-                String.format("Error in monitor %s", getClass()),
-                e.getMessage()
+                    String.format("Error in monitor %s", getClass()),
+                    e.getMessage()
             ).build();
         }
     }

@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
@@ -47,7 +46,7 @@ public class MetadataMonitor implements Monitor {
 
         ZonedDateTime halfDayFromNow = ZonedDateTime.now(systemDefault()).plusHours(12);
         assertTrue("validUntil of the metadata should be at least 12 hrs in future",
-            validUntil(responseEntity.getBody()).isAfter(halfDayFromNow));
+                validUntil(responseEntity.getBody()).isAfter(halfDayFromNow));
     }
 
     private ZonedDateTime validUntil(String metaData) {

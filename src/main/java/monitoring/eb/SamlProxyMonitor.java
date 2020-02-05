@@ -35,7 +35,7 @@ public class SamlProxyMonitor implements Monitor {
             doMonitor();
         } catch (RuntimeException e) {
             LOG.warn("Exception occurred. Current page is {} and pageSource is {}", driver.getCurrentUrl(), driver
-                .getPageSource());
+                    .getPageSource());
             throw e;
         }
     }
@@ -44,17 +44,17 @@ public class SamlProxyMonitor implements Monitor {
         driver = new HtmlUnitDriver(false);
         driver.manage().deleteAllCookies();
         driver.manage().timeouts()
-            .implicitlyWait(5, TimeUnit.MINUTES)
-            .pageLoadTimeout(5, TimeUnit.MINUTES)
-            .setScriptTimeout(5, TimeUnit.MINUTES);
+                .implicitlyWait(5, TimeUnit.MINUTES)
+                .pageLoadTimeout(5, TimeUnit.MINUTES)
+                .setScriptTimeout(5, TimeUnit.MINUTES);
 
         driver.get(mujinaServiceProviderBaseUrl + "/user.html");
 
         boolean wayf = driver.getPageSource().contains("Select an institution to login to the service");
         if (wayf) {
             WebElement login = driver.findElement(
-                By.xpath(String.format("//input[@data-entityid=\"%s\"]",
-                    StringEscapeUtils.escapeXml11(idpEntityId))));
+                    By.xpath(String.format("//input[@data-entityid=\"%s\"]",
+                            StringEscapeUtils.escapeXml11(idpEntityId))));
             login.click();
         }
 
@@ -78,6 +78,6 @@ public class SamlProxyMonitor implements Monitor {
 
         String pageSource = driver.getPageSource();
         assertTrue(String.format("Page should contain %s j.doe@example.com", pageSource),
-            pageSource.contains("j.doe@example.com"));
+                pageSource.contains("j.doe@example.com"));
     }
 }

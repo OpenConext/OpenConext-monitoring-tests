@@ -12,8 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 
 @SpringBootApplication(exclude = {
-    TraceWebFilterAutoConfiguration.class,
-    MetricFilterAutoConfiguration.class
+        TraceWebFilterAutoConfiguration.class,
+        MetricFilterAutoConfiguration.class
 })
 public class MonitoringApplication {
 

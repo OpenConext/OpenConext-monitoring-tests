@@ -36,6 +36,14 @@ voot:
     secret: secret
     person_id: urn:collab:person:example.com:admin
 
+oidcng:
+  base_url: https://connect.test2.surfconext.nl/oidc
+  client_id: playground_client
+  secret: secret
+  resource_server_id: resource-server-playground-client
+  resource_server_secret: secret
+
+
 # We disable all endpoints except health for the load-balancer and info for git information.
 endpoints:
   enabled: false
