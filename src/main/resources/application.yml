@@ -23,12 +23,6 @@ pdp:
   base_url: https://pdp.test2.surfconext.nl
 
 voot:
-  authz:
-    authorization_url: https://authz.test2.surfconext.nl/oauth/token
-    voot_base_url: https://voot.test2.surfconext.nl
-    client_id: engineblock
-    secret: secret
-    person_id: urn:collab:person:example.com:admin
   oidc:
     authorization_url: https://oidc.test2.surfconext.nl/token
     voot_base_url: https://voot.test2.surfconext.nl
