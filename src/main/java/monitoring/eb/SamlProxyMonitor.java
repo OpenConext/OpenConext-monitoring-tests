@@ -9,6 +9,7 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertTrue;
@@ -50,15 +51,16 @@ public class SamlProxyMonitor implements Monitor {
 
         driver.get(mujinaServiceProviderBaseUrl + "/user.html");
 
-        boolean wayf = driver.getPageSource().contains("Select an institution to login to the service");
+        boolean wayf = driver.getPageSource().contains("Select an institution to login");
         if (wayf) {
-            WebElement login = driver.findElement(
-                    By.xpath(String.format("//input[@data-entityid=\"%s\"]",
-                            StringEscapeUtils.escapeXml11(idpEntityId))));
-            login.click();
+            String escapedId = StringEscapeUtils.escapeXml11(idpEntityId);
+            String xpath = String.format("//input[@value=\"%s\"]/parent::form//button", escapedId);
+            WebElement button = driver.findElement(By.xpath(xpath));
+            button.click();
         }
 
-        driver.findElement(By.xpath("//input[@value=\"Submit\"]")).click();
+        WebElement form = driver.findElement(By.xpath("//form"));
+        form.submit();
 
         driver.findElement(By.name("username")).sendKeys(userName);
         driver.findElement(By.name("password")).sendKeys("secret");
@@ -67,11 +69,12 @@ public class SamlProxyMonitor implements Monitor {
         driver.findElement(By.xpath("//input[@value=\"Continue\"]")).click();
 
         //consent
-        if (driver.getPageSource().contains("Yes, share this data")) {
-            driver.findElement(By.id("accept_terms_button")).submit();
+        if (driver.getPageSource().contains("Review your information")) {
+            form = driver.findElement(By.xpath("//form"));
+            form.submit();
         }
-
-        driver.findElement(By.xpath("//input[@value=\"Submit\"]")).click();
+        form = driver.findElement(By.xpath("//form"));
+        form.submit();
 
         //force the time-out to wait for the page load
         driver.findElement(By.className("attributes"));
