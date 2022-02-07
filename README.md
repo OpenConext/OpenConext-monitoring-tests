@@ -40,7 +40,7 @@ PDP
 
 Installation
 ============
-Running the application locally requires a Java 8 VM:
+Running the application locally requires a Java 11 VM:
 
 ```bash
 mvn clean install
