@@ -27,9 +27,9 @@ public class MonitoringApplicationTest {
     private int serverPort;
 
     @Test
-    public void main() throws Exception {
+    public void main() {
         ResponseEntity<Map> responseEntity = new TestRestTemplate(user, password)
-                .getForEntity("http://localhost:" + serverPort + "/health", Map.class);
+                .getForEntity("http://localhost:" + serverPort + "/actuator/health", Map.class);
         assertEquals(200, responseEntity.getStatusCodeValue());
     }
 
