@@ -24,9 +24,9 @@ pdp:
 
 voot:
   oidc:
-    authorization_url: https://oidc.test2.surfconext.nl/token
+    authorization_url: https://connect.test2.surfconext.nl/oidc/token
     voot_base_url: https://voot.test2.surfconext.nl
-    client_id: https@//authz-playground.test2.surfconext.nl
+    client_id: playground_client
     secret: secret
     person_id: urn:collab:person:example.com:admin
 

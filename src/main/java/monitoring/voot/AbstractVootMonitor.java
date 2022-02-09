@@ -4,6 +4,7 @@ import monitoring.Monitor;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public abstract class AbstractVootMonitor implements Monitor {
         details.setAccessTokenUri(authorizationURL);
         details.setClientId(clientId);
         details.setClientSecret(secret);
-        details.setScope(Collections.singletonList("groups"));
+        details.setScope(Arrays.asList("openid", "groups"));
 
         OAuth2RestTemplate template = new OAuth2RestTemplate(details);
         //pre-populate to enforce caching and allow for retry with the already obtained accessToken

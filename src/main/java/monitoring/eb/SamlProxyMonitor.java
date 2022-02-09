@@ -51,7 +51,7 @@ public class SamlProxyMonitor implements Monitor {
 
         driver.get(mujinaServiceProviderBaseUrl + "/user.html");
 
-        boolean wayf = driver.getPageSource().contains("Select an institution to login");
+        boolean wayf = driver.getPageSource().contains("Select an account to login");
         if (wayf) {
             String escapedId = StringEscapeUtils.escapeXml11(idpEntityId);
             String xpath = String.format("//input[@value=\"%s\"]/parent::form//button", escapedId);
