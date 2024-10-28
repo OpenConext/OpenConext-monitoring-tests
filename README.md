@@ -2,7 +2,7 @@ OpenConext-monitoring-tests
 ===========================
 
 OpenConext-monitoring-tests provides a standalone Spring Boot Java application that performs tests on an OpenConext instance. 
-The application can performs different health check tests that can be used to monitor the availability of a OpenConext (production) instance. 
+The application performs different health check tests that can be used to monitor the availability of a OpenConext (production) instance. 
 
 The health endpoint is available on 'http://localhost:9000/health' and is secured with username / password.
 
@@ -40,7 +40,7 @@ PDP
 
 Installation
 ============
-Running the application locally requires a Java 11 VM:
+Running the application locally requires a Java 21 VM:
 
 ```bash
 mvn clean install
