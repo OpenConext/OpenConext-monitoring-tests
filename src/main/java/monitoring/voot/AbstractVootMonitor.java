@@ -1,12 +1,17 @@
 package monitoring.voot;
 
 import monitoring.Monitor;
-import org.springframework.security.oauth2.client.OAuth2RestTemplate;
-import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -15,11 +20,11 @@ public abstract class AbstractVootMonitor implements Monitor {
 
     private static final String nonExistingPersonId = "urn:collab:person:some-nonexisting-org:monitoring-user";
 
-    private String authorizationURL;
-    private String vootBaseUrl;
-    private String clientId;
-    private String secret;
-    private String personId;
+    private final String authorizationURL;
+    private final String vootBaseUrl;
+    private final String clientId;
+    private final String secret;
+    private final String personId;
 
     protected AbstractVootMonitor(String authorizationURL,
                                   String vootBaseUrl,
@@ -35,35 +40,45 @@ public abstract class AbstractVootMonitor implements Monitor {
 
     @Override
     public void monitor() throws InterruptedException {
-        ClientCredentialsResourceDetails details = new ClientCredentialsResourceDetails();
-        details.setAccessTokenUri(authorizationURL);
-        details.setClientId(clientId);
-        details.setClientSecret(secret);
-        details.setScope(Arrays.asList("openid", "groups"));
-
-        OAuth2RestTemplate template = new OAuth2RestTemplate(details);
+        RestTemplate restTemplate = new RestTemplate();
         //pre-populate to enforce caching and allow for retry with the already obtained accessToken
-        template.getAccessToken();
+        String accessToken = fetchAccessToken(restTemplate);
         Thread.sleep(2500);
-        doMonitor(true, 1, template);
+        doMonitor(true, 1, restTemplate, accessToken);
     }
 
-    private void doMonitor(boolean retry, int count, OAuth2RestTemplate template) {
+    private String fetchAccessToken(RestTemplate restTemplate) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setBasicAuth(clientId, secret);
+
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", "client_credentials");
+        body.add("scope", "openid groups");
+
+        ResponseEntity<Map> response = restTemplate.postForEntity(authorizationURL, new HttpEntity<>(body, headers), Map.class);
+        return (String) response.getBody().get("access_token");
+    }
+
+    private void doMonitor(boolean retry, int count, RestTemplate restTemplate, String accessToken) {
         String url = vootBaseUrl + "/internal/groups/{userId}";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
         try {
-            List groups = template.getForObject(url, List.class, personId);
+            List groups = restTemplate.exchange(url, HttpMethod.GET, entity, List.class, personId).getBody();
             assertFalse(personId + " must have group memberships", groups.isEmpty());
 
-            groups = template.getForObject(url, List.class, nonExistingPersonId);
+            groups = restTemplate.exchange(url, HttpMethod.GET, entity, List.class, nonExistingPersonId).getBody();
             assertTrue(nonExistingPersonId + " must not have memberships", groups.isEmpty());
         } catch (RuntimeException e) {
             if (retry) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e1) {
-                    throw new RuntimeException(e);
+                    throw new RuntimeException(e1);
                 }
-                this.doMonitor(count < 5, count + 1, template);
+                this.doMonitor(count < 5, count + 1, restTemplate, accessToken);
             } else {
                 throw e;
             }

@@ -60,7 +60,3 @@ info:
   build:
     artifact: "@project.artifactId@"
     version: "@project.version@"
-security:
-  user:
-    name: user
-    password: secret

@@ -2,7 +2,7 @@ package monitoring.oidcng;
 
 import monitoring.Monitor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -18,11 +18,11 @@ import static org.junit.Assert.assertEquals;
 @Component
 public class OidcNGMonitor implements Monitor {
 
-    private String resourceServerId;
-    private String resourceServerSecret;
-    private String baseURL;
-    private String clientId;
-    private String secret;
+    private final String resourceServerId;
+    private final String resourceServerSecret;
+    private final String baseURL;
+    private final String clientId;
+    private final String secret;
 
     public OidcNGMonitor(@Value("${oidcng.base_url}") String baseURL,
                          @Value("${oidcng.client_id}") String clientId,

@@ -4,7 +4,7 @@ OpenConext-monitoring-tests
 OpenConext-monitoring-tests provides a standalone Spring Boot Java application that performs tests on an OpenConext instance. 
 The application performs different health check tests that can be used to monitor the availability of a OpenConext (production) instance. 
 
-The health endpoint is available on 'http://localhost:9000/health' and is secured with username / password.
+The health endpoint is available on 'http://localhost:9000/actuator/health'.
 
 Available tests
 ===============
@@ -45,7 +45,7 @@ Running the application locally requires a Java 21 VM:
 ```bash
 mvn clean install
 mvn spring-boot:run
-curl -u user:secret 'http://localhost:9000/health'
+curl 'http://localhost:9000/actuator/health'
 ```
 
 Before running the tests:
