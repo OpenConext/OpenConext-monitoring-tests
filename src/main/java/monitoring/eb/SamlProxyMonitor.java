@@ -81,7 +81,7 @@ public class SamlProxyMonitor implements Monitor {
 
         String pageSource = driver.getPageSource();
         String schacHomeOrganization = "example.com";
-        assertTrue(String.format("Page should contain %s %s", pageSource, schacHomeOrganization),
+        assertTrue(String.format("Page %s should contain '%s' string", pageSource, schacHomeOrganization),
                 pageSource.contains(schacHomeOrganization));
     }
 }
