@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -25,6 +26,7 @@ public abstract class AbstractVootMonitor implements Monitor {
     private final String clientId;
     private final String secret;
     private final String personId;
+    private final RestTemplate restTemplate;
 
     protected AbstractVootMonitor(String authorizationURL,
                                   String vootBaseUrl,
@@ -36,11 +38,14 @@ public abstract class AbstractVootMonitor implements Monitor {
         this.clientId = clientId;
         this.secret = secret;
         this.personId = personId;
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(10_000);
+        factory.setReadTimeout(30_000);
+        this.restTemplate = new RestTemplate(factory);
     }
 
     @Override
     public void monitor() throws InterruptedException {
-        RestTemplate restTemplate = new RestTemplate();
         //pre-populate to enforce caching and allow for retry with the already obtained accessToken
         String accessToken = fetchAccessToken(restTemplate);
         Thread.sleep(2500);

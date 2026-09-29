@@ -49,6 +49,8 @@ management:
       enabled: true
     health:
       show-details: always
+      cache:
+        time-to-live: 20s
     mappings:
       enabled: true
   info:

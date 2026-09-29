@@ -2,11 +2,13 @@ package monitoring.oidcng;
 
 import monitoring.Monitor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.client.support.BasicAuthenticationInterceptor;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -23,6 +25,8 @@ public class OidcNGMonitor implements Monitor {
     private final String baseURL;
     private final String clientId;
     private final String secret;
+    private final RestTemplate clientRestTemplate;
+    private final RestTemplate resourceServerRestTemplate;
 
     public OidcNGMonitor(@Value("${oidcng.base_url}") String baseURL,
                          @Value("${oidcng.client_id}") String clientId,
@@ -34,6 +38,17 @@ public class OidcNGMonitor implements Monitor {
         this.secret = secret;
         this.resourceServerId = resourceServerId;
         this.resourceServerSecret = resourceServerSecret;
+        this.clientRestTemplate = restTemplate(clientId, secret);
+        this.resourceServerRestTemplate = restTemplate(resourceServerId, resourceServerSecret);
+    }
+
+    private static RestTemplate restTemplate(String user, String password) {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(10_000);
+        factory.setReadTimeout(30_000);
+        RestTemplate restTemplate = new RestTemplate(factory);
+        restTemplate.getInterceptors().add(new BasicAuthenticationInterceptor(user, password));
+        return restTemplate;
     }
 
     @Override
@@ -46,11 +61,11 @@ public class OidcNGMonitor implements Monitor {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 
-        ResponseEntity<Map> response = new TestRestTemplate(clientId, secret).postForEntity(baseURL + "/token", request, Map.class);
+        ResponseEntity<Map> response = clientRestTemplate.postForEntity(baseURL + "/token", request, Map.class);
         String accessToken = (String) response.getBody().get("access_token");
 
         request = new HttpEntity<>(headers);
-        response = new TestRestTemplate(resourceServerId, resourceServerSecret).postForEntity(baseURL + "/introspect?token=" + accessToken, request, Map.class);
+        response = resourceServerRestTemplate.postForEntity(baseURL + "/introspect?token=" + accessToken, request, Map.class);
 
         assertEquals(true, response.getBody().get("active"));
     }

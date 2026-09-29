@@ -3,13 +3,17 @@ package monitoring.pdp;
 import monitoring.Monitor;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.client.support.BasicAuthenticationInterceptor;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.stereotype.Component;
+
+import java.io.InputStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -22,6 +26,7 @@ public class PdPMonitor implements Monitor {
     private String idpEntityId;
     private String spEntityId;
     private String pdpBaseUrl;
+    private final RestTemplate restTemplate;
 
     public PdPMonitor(@Value("${pdp.user}") String pdpUserName,
                       @Value("${pdp.password}") String pdpPassword,
@@ -33,13 +38,19 @@ public class PdPMonitor implements Monitor {
         this.idpEntityId = idpEntityId;
         this.spEntityId = spEntityId;
         this.pdpBaseUrl = pdpBaseUrl;
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(10_000);
+        factory.setReadTimeout(30_000);
+        this.restTemplate = new RestTemplate(factory);
+        this.restTemplate.getInterceptors().add(new BasicAuthenticationInterceptor(pdpUserName, pdpPassword));
     }
 
     @Override
     public void monitor() throws Exception {
-        TestRestTemplate restTemplate = new TestRestTemplate(pdpUserName, pdpPassword);
-
-        String body = IOUtils.toString(new ClassPathResource("pdp/request.json").getInputStream());
+        String body;
+        try (InputStream in = new ClassPathResource("pdp/request.json").getInputStream()) {
+            body = IOUtils.toString(in);
+        }
         body = body.replaceAll("@@IDP_ENTITY_ID@@", idpEntityId);
         body = body.replaceAll("@@SP_ENTITY_ID@@", spEntityId);
 

@@ -17,7 +17,6 @@ import static org.junit.Assert.assertTrue;
 @Component
 public class SamlProxyMonitor implements Monitor {
 
-    private WebDriver driver;
     private String mujinaServiceProviderBaseUrl;
     private String idpEntityId;
     private String userName;
@@ -32,22 +31,25 @@ public class SamlProxyMonitor implements Monitor {
 
     @Override
     public void monitor() {
+        WebDriver driver = new HtmlUnitDriver(false);
         try {
-            doMonitor();
+            doMonitor(driver);
         } catch (RuntimeException e) {
             LOG.warn("Exception occurred. Current page is {} and pageSource is {}", driver.getCurrentUrl(), driver
                     .getPageSource());
             throw e;
+        } finally {
+            // Releases the HtmlUnit WebClient (connection pool, caches, history, threads)
+            driver.quit();
         }
     }
 
-    private void doMonitor() {
-        driver = new HtmlUnitDriver(false);
+    private void doMonitor(WebDriver driver) {
         driver.manage().deleteAllCookies();
         driver.manage().timeouts()
-                .implicitlyWait(5, TimeUnit.MINUTES)
-                .pageLoadTimeout(5, TimeUnit.MINUTES)
-                .setScriptTimeout(5, TimeUnit.MINUTES);
+                .implicitlyWait(30, TimeUnit.SECONDS)
+                .pageLoadTimeout(30, TimeUnit.SECONDS)
+                .setScriptTimeout(30, TimeUnit.SECONDS);
 
         driver.get(mujinaServiceProviderBaseUrl + "/user.html");
 
